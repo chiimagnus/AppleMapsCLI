@@ -131,6 +131,16 @@ struct GeocodeResponse: Sendable, Codable, Equatable {
     let results: [GeocodeResult]
 }
 
+struct BatchGeocodeResult: Sendable, Codable, Equatable {
+    let query: String
+    let results: [GeocodeResult]
+}
+
+struct BatchGeocodeResponse: Sendable, Codable, Equatable {
+    let count: Int
+    let results: [BatchGeocodeResult]
+}
+
 struct ReverseGeocodeResponse: Sendable, Codable, Equatable {
     let coordinate: Coordinate
     let results: [GeocodeResult]
