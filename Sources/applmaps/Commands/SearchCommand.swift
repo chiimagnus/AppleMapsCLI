@@ -52,6 +52,9 @@ struct SearchCommand: AsyncParsableCommand {
             case .invalidUTF8:
                 StderrOutput().writeLine("Failed to encode JSON output as UTF-8.")
                 throw ExitCode(rawValue: 2)
+            case let .invalidFields(message):
+                StderrOutput().writeLine(message)
+                throw ExitCode(rawValue: 1)
             }
         } catch {
             StderrOutput().writeLine("Unexpected search command failure: \(error.localizedDescription)")

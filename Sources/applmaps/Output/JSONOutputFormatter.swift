@@ -2,6 +2,7 @@ import Foundation
 
 enum JSONOutputFormatterError: Error, Sendable, Equatable {
     case invalidUTF8
+    case invalidFields(String)
 }
 
 enum JSONOutputFormatter {
