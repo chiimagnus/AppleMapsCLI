@@ -245,3 +245,21 @@ Date: 2026-02-16T07:23:40Z
   - `.build/debug/applmaps open --help` shows expected usage and flags.
   - `.build/debug/applmaps open --location "37.78,-122.41" --zoom 14` returns JSON with constructed URL and `opened` status.
   - `.build/debug/applmaps open --search "coffee" --location "37.78,-122.41"` exits `1` with mode exclusivity validation.
+
+## Iteration 8 — S08-pin-command — Pin command
+Date: 2026-02-16T07:27:37Z
+- Implemented `pin` command for dropping a pin from positional coordinates with optional `--label`.
+- Added `MapsURLBuilder.pin` for deterministic pin URL construction (`ll` + optional `q`).
+- Added runtime token parsing to support acceptance-style trailing options after signed coordinates (e.g., `pin 37.78 -122.41 --label Office`).
+- Reused `OpenResponse` output contract and `NSWorkspace` dispatch pattern (`opened` reflects dispatch success).
+- Added deterministic tests:
+  - `PinCommandParsingTests`
+  - Extended `MapsURLBuilderTests` with pin URL cases
+- Wired `PinCommand` into root command tree (`applmaps pin`).
+- Verified with:
+  - `swift build --disable-sandbox`
+  - `swift build -c release --disable-sandbox`
+  - `swift test --disable-sandbox --verbose`
+- Manual smoke checks:
+  - `.build/debug/applmaps pin 37.78 -122.41 --label "Office"` returns JSON with pin URL and `opened` status.
+  - `.build/debug/applmaps pin 100 0` exits `1` with latitude validation.

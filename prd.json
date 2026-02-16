@@ -124,7 +124,7 @@
       "acceptance": [
         "applmaps pin 37.78 -122.41 --label \"Office\""
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S09",
