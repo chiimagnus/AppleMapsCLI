@@ -270,6 +270,12 @@ struct DirectionsResponse: Sendable, Codable, Equatable {
     let routes: [Route]
 }
 
+struct OpenResponse: Sendable, Codable, Equatable {
+    let action: String
+    let url: String
+    let opened: Bool
+}
+
 private extension String {
     var nilIfEmpty: String? {
         let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
