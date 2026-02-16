@@ -117,6 +117,8 @@ enum CommandSchemaRegistry {
             return document(command: "reverse", input: reverseInput, output: reverseOutput)
         case "search":
             return document(command: "search", input: searchInput, output: searchOutput)
+        case "complete":
+            return document(command: "complete", input: completeInput, output: completeOutput)
         case "directions":
             return document(command: "directions", input: directionsInput, output: directionsOutput)
         case "eta":
@@ -219,6 +221,15 @@ enum CommandSchemaRegistry {
             "maps_url": .string()
         ],
         required: ["name", "coordinate", "address", "maps_url"]
+    )
+
+    private static let searchCompletion = JSONSchemaNode.object(
+        properties: [
+            "title": .string(),
+            "subtitle": .string(),
+            "display": .string()
+        ],
+        required: ["title", "subtitle", "display"]
     )
 
     private static let routeStep = JSONSchemaNode.object(
@@ -343,6 +354,26 @@ enum CommandSchemaRegistry {
             "query": .string(),
             "count": .integer(),
             "results": .array(place)
+        ],
+        required: ["query", "count", "results"]
+    )
+
+    private static let completeInput = JSONSchemaNode.object(
+        properties: [
+            "query": .string(description: "Partial query for autocomplete suggestions."),
+            "limit": .integer(description: "Maximum suggestion count."),
+            "fields": .string(description: "Comma-separated JSON fields projection."),
+            "pretty": .boolean(description: "Pretty-print JSON output."),
+            "json_schema": .boolean(description: "Return this command schema instead of executing.")
+        ],
+        required: ["query"]
+    )
+
+    private static let completeOutput = JSONSchemaNode.object(
+        properties: [
+            "query": .string(),
+            "count": .integer(),
+            "results": .array(searchCompletion)
         ],
         required: ["query", "count", "results"]
     )

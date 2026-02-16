@@ -7,6 +7,7 @@ struct CommandSchemaRegistryTests {
         "geocode",
         "reverse",
         "search",
+        "complete",
         "directions",
         "eta",
         "open",
@@ -42,5 +43,15 @@ struct CommandSchemaRegistryTests {
         #expect(resultsItems?.properties?["name"]?.type == "string")
         #expect(resultsItems?.properties?["coordinate"]?.properties?["lat"]?.type == "number")
         #expect(resultsItems?.properties?["maps_url"]?.type == "string")
+    }
+
+    @Test("Complete schema output includes suggestion shape")
+    func completeSchemaShape() {
+        let schema = CommandSchemaRegistry.schema(for: "complete")
+        let resultsItems = schema?.output.properties?["results"]?.items
+
+        #expect(resultsItems?.properties?["title"]?.type == "string")
+        #expect(resultsItems?.properties?["subtitle"]?.type == "string")
+        #expect(resultsItems?.properties?["display"]?.type == "string")
     }
 }
