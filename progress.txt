@@ -282,3 +282,22 @@ Date: 2026-02-16T07:36:34Z
   - `.build/debug/applmaps open --location "37.78,-122.41" --fields url` returns projected JSON and exit `0`.
   - `.build/debug/applmaps open --location "37.78,-122.41" --fields "url,,opened"` exits `1` with actionable validation.
   - `.build/debug/applmaps search "coffee" --fields name,coordinate` reaches MapKit and exits `2` in this environment due network/API failure (expected semantic mapping).
+
+## Iteration 10 — S10-shell-completions — Shell completions
+Date: 2026-02-16T07:40:48Z
+- Added `applmaps completions <shell>` command to generate shell scripts for `zsh`, `bash`, and `fish`.
+- Implemented script generation by delegating to ArgumentParser’s built-in `--generate-completion-script` on the current executable.
+- Added explicit runtime shell validation so unsupported shells map to semantic user error exit `1`.
+- Wired the new command into the root command tree.
+- Added deterministic tests:
+  - `CompletionsCommandParsingTests` for CLI parsing and shell validation behavior.
+  - `CompletionsScriptGenerationTests` verifying non-empty generated scripts for all supported shells.
+- Verified with:
+  - `swift build --disable-sandbox`
+  - `swift build -c release --disable-sandbox`
+  - `swift test --disable-sandbox --verbose`
+- Manual smoke checks:
+  - `.build/debug/applmaps completions zsh` outputs zsh script header (`#compdef applmaps`) and exits `0`.
+  - `.build/debug/applmaps completions bash` outputs bash registration line and exits `0`.
+  - `.build/debug/applmaps completions fish` outputs fish `complete -c 'applmaps'` directives and exits `0`.
+  - `.build/debug/applmaps completions powershell` exits `1` with actionable validation.

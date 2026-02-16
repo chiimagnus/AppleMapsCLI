@@ -153,7 +153,7 @@
       "acceptance": [
         "Tab completion works for commands and flags"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S11",

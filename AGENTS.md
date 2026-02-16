@@ -582,6 +582,12 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Discovery:** Flags placed after coordinates are absorbed into passthrough tokens, so ArgumentParser does not populate option properties.
 **Pattern:** Add a command-local token parser for passthrough commands (`reverse`, `pin`) that resolves trailing `--fields` / `--pretty` / command-specific flags before coordinate validation.
 
+### Completion Script Generation — Delegate to ArgumentParser built-in flag
+**Discovered in:** Iteration 10, Story S10
+**Context:** Implementing explicit shell completion generation for `zsh`, `bash`, and `fish`.
+**Discovery:** Swift ArgumentParser already provides stable script generation through `--generate-completion-script <shell>`.
+**Pattern:** Expose a user-facing command that delegates to the current executable with `--generate-completion-script`, then add explicit shell validation in command logic to preserve semantic exit codes (`1` for invalid shell).
+
 ### MapKit ETA Response Type — Use Swift name `MKDirections.ETAResponse`
 **Discovered in:** Iteration 4, Story S04
 **Context:** Implementing the `eta` command service with `MKDirections.calculateETA()`.
