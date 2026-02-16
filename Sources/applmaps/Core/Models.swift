@@ -218,6 +218,18 @@ struct SearchResponse: Sendable, Codable, Equatable {
     let results: [Place]
 }
 
+struct SearchCompletion: Sendable, Codable, Equatable {
+    let title: String
+    let subtitle: String
+    let display: String
+}
+
+struct SearchCompletionResponse: Sendable, Codable, Equatable {
+    let query: String
+    let count: Int
+    let results: [SearchCompletion]
+}
+
 enum TransportMode: String, Sendable, Codable, Equatable, CaseIterable {
     case driving
     case walking
