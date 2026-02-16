@@ -139,7 +139,7 @@
       "acceptance": [
         "applmaps search \"coffee\" --fields name,coordinate"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S10",

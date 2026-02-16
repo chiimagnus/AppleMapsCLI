@@ -570,6 +570,18 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Discovery:** Swift Argument Parser treats dash-prefixed positionals as options under default positional parsing.
 **Pattern:** For commands that accept signed numeric positional values, capture coordinates as `@Argument(parsing: .captureForPassthrough) [String]` and parse/validate manually in the command or runner.
 
+### JSON Field Projection — Project after encoding and keep container paths
+**Discovered in:** Iteration 9, Story S09
+**Context:** Implementing `--fields name,coordinate` for command outputs where requested fields live inside nested arrays (for example `results`).
+**Discovery:** Naive top-level key filtering drops nested matches and can produce empty payloads.
+**Pattern:** Apply projection to encoded JSON (`snake_case` already applied), recurse through objects/arrays, and keep parent containers only when descendants match requested keys.
+
+### Passthrough Coordinate Flags — Parse trailing options from captured tokens
+**Discovered in:** Iteration 9, Story S09
+**Context:** Adding `--fields` to coordinate commands that already use passthrough capture for signed values.
+**Discovery:** Flags placed after coordinates are absorbed into passthrough tokens, so ArgumentParser does not populate option properties.
+**Pattern:** Add a command-local token parser for passthrough commands (`reverse`, `pin`) that resolves trailing `--fields` / `--pretty` / command-specific flags before coordinate validation.
+
 ### MapKit ETA Response Type — Use Swift name `MKDirections.ETAResponse`
 **Discovered in:** Iteration 4, Story S04
 **Context:** Implementing the `eta` command service with `MKDirections.calculateETA()`.
