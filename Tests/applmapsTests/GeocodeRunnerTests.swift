@@ -76,6 +76,15 @@ private struct MockGeocodingService: GeocodingService {
             throw error
         }
     }
+
+    func reverseGeocode(coordinate: Coordinate) async throws -> [GeocodeResult] {
+        switch behavior {
+        case let .success(results):
+            return results
+        case let .failure(error):
+            throw error
+        }
+    }
 }
 
 private enum Fixtures {

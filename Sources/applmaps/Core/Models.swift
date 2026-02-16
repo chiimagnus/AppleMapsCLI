@@ -108,6 +108,11 @@ struct GeocodeResponse: Sendable, Codable, Equatable {
     let results: [GeocodeResult]
 }
 
+struct ReverseGeocodeResponse: Sendable, Codable, Equatable {
+    let coordinate: Coordinate
+    let results: [GeocodeResult]
+}
+
 private extension String {
     var nilIfEmpty: String? {
         let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
