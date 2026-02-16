@@ -7,7 +7,8 @@ struct ApplMaps: AsyncParsableCommand {
         abstract: "Agent-first Apple Maps CLI for macOS",
         subcommands: [
             GeocodeCommand.self,
-            ReverseCommand.self
+            ReverseCommand.self,
+            SearchCommand.self
         ]
     )
 }
