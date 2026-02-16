@@ -1,9 +1,32 @@
 import CoreLocation
 import Foundation
+import MapKit
 
 struct Coordinate: Sendable, Codable, Equatable {
     let lat: Double
     let lon: Double
+
+    init(lat: Double, lon: Double) {
+        self.lat = lat
+        self.lon = lon
+    }
+
+    init?(string: String) {
+        let parts = string
+            .split(separator: ",", maxSplits: 1, omittingEmptySubsequences: false)
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+
+        guard parts.count == 2,
+              let lat = Double(parts[0]),
+              let lon = Double(parts[1]),
+              (-90.0...90.0).contains(lat),
+              (-180.0...180.0).contains(lon) else {
+            return nil
+        }
+
+        self.lat = lat
+        self.lon = lon
+    }
 }
 
 struct Address: Sendable, Codable, Equatable {
@@ -111,6 +134,78 @@ struct GeocodeResponse: Sendable, Codable, Equatable {
 struct ReverseGeocodeResponse: Sendable, Codable, Equatable {
     let coordinate: Coordinate
     let results: [GeocodeResult]
+}
+
+struct Place: Sendable, Codable, Equatable {
+    let name: String
+    let coordinate: Coordinate
+    let address: Address
+    let phone: String?
+    let url: String?
+    let category: String?
+    let timezone: String?
+    let mapsUrl: String
+
+    init(
+        name: String,
+        coordinate: Coordinate,
+        address: Address,
+        phone: String?,
+        url: String?,
+        category: String?,
+        timezone: String?,
+        mapsUrl: String
+    ) {
+        self.name = name
+        self.coordinate = coordinate
+        self.address = address
+        self.phone = phone
+        self.url = url
+        self.category = category
+        self.timezone = timezone
+        self.mapsUrl = mapsUrl
+    }
+
+    init?(mapItem: MKMapItem) {
+        guard let location = mapItem.placemark.location else {
+            return nil
+        }
+
+        let resolvedName: String
+        if let name = mapItem.name?.nilIfEmpty {
+            resolvedName = name
+        } else {
+            resolvedName = mapItem.placemark.title?.nilIfEmpty ?? "Unnamed place"
+        }
+
+        let coordinate = Coordinate(
+            lat: location.coordinate.latitude,
+            lon: location.coordinate.longitude
+        )
+
+        self.init(
+            name: resolvedName,
+            coordinate: coordinate,
+            address: Address(placemark: mapItem.placemark),
+            phone: mapItem.phoneNumber,
+            url: mapItem.url?.absoluteString,
+            category: mapItem.pointOfInterestCategory?.rawValue,
+            timezone: mapItem.placemark.timeZone?.identifier,
+            mapsUrl: Place.makeMapsURL(name: resolvedName, coordinate: coordinate)
+        )
+    }
+
+    private static func makeMapsURL(name: String, coordinate: Coordinate) -> String {
+        let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+            ?? "location"
+        return "https://maps.apple.com/?ll=\(coordinate.lat),\(coordinate.lon)&q=\(encodedName)"
+    }
+}
+
+struct SearchResponse: Sendable, Codable, Equatable {
+    let query: String
+    let count: Int
+    let results: [Place]
 }
 
 private extension String {
