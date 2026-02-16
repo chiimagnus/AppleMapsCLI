@@ -11,7 +11,8 @@ struct ApplMaps: AsyncParsableCommand {
             SearchCommand.self,
             DirectionsCommand.self,
             ETACommand.self,
-            OpenCommand.self
+            OpenCommand.self,
+            PinCommand.self
         ]
     )
 }
