@@ -20,7 +20,7 @@
       "acceptance": [
         "applmaps geocode \"Apple Park\" returns valid JSON"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S02",

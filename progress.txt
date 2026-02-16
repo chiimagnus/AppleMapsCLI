@@ -132,3 +132,13 @@ Utilities/ → Core/ → Output/ → Commands/ → @main
 **Full permission granted. Execute immediately. Good luck!**
 
 ---
+
+## Iteration 1 — S01-geocode-command — Geocode command
+Date: 2026-02-16T05:39:24Z
+- Implemented initial SwiftPM applmaps CLI scaffold and shipped the `geocode` subcommand.
+- Added layered modules per AGENTS.md §5: `Core/` (models, geocoding service, runner), `Output/` (JSON formatter), `Commands/` (Geocode command), `Utilities/` (semantic CLI error + stderr/TTY helpers).
+- Enforced semantic error translation for geocode flows: user input -> exit `1`, network/service failures -> exit `2`, no results -> exit `3`.
+- Added deterministic Swift Testing coverage for geocode runner behavior and JSON formatting (snake_case schema, compact vs pretty output).
+- Verified with `swift build --disable-sandbox`, `swift build -c release --disable-sandbox`, and `swift test --disable-sandbox --verbose`.
+- Manual smoke check passed: `.build/debug/applmaps geocode "Apple Park"` returned JSON payload with exit `0`.
+- Discovered patterns were documented in `AGENTS.md §13` (explicit ArgumentParser `commandName` and `@main` entrypoint filename guidance).
