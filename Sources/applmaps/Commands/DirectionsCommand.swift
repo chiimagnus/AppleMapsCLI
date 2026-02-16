@@ -19,6 +19,9 @@ struct DirectionsCommand: AsyncParsableCommand {
     @Flag(name: .long, help: "Request alternate routes when available")
     var alternatives: Bool = false
 
+    @Option(name: .long, help: "Comma-separated JSON fields to include in output")
+    var fields: String?
+
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
@@ -33,7 +36,11 @@ struct DirectionsCommand: AsyncParsableCommand {
                 mode: parsedMode,
                 alternatives: alternatives
             )
-            let output = try JSONOutputFormatter.format(response, forcePretty: pretty)
+            let output = try JSONOutputFormatter.format(
+                response,
+                forcePretty: pretty,
+                fields: fields
+            )
             print(output)
         } catch let error as CLIError {
             StderrOutput().writeLine(error.message)

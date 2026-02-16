@@ -8,11 +8,13 @@ struct OpenCommandParsingTests {
         let parsed = try OpenCommand.parse([
             "--location", "37.78,-122.41",
             "--zoom", "14",
+            "--fields", "url",
             "--pretty"
         ])
 
         #expect(parsed.location == "37.78,-122.41")
         #expect(parsed.zoom == 14)
+        #expect(parsed.fields == "url")
         #expect(parsed.pretty)
     }
 

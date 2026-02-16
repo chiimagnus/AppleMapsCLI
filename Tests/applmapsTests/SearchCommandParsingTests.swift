@@ -10,6 +10,7 @@ struct SearchCommandParsingTests {
             "--near", "40.71,-74.00",
             "--radius", "500",
             "--limit", "5",
+            "--fields", "name,coordinate",
             "--pretty"
         ])
 
@@ -17,6 +18,7 @@ struct SearchCommandParsingTests {
         #expect(parsed.near == "40.71,-74.00")
         #expect(parsed.radius == 500)
         #expect(parsed.limit == 5)
+        #expect(parsed.fields == "name,coordinate")
         #expect(parsed.pretty)
     }
 

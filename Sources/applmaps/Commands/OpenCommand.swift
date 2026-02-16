@@ -26,6 +26,9 @@ struct OpenCommand: AsyncParsableCommand {
     @Option(name: .long, help: "Zoom level for --location (2...21)")
     var zoom: Int?
 
+    @Option(name: .long, help: "Comma-separated JSON fields to include in output")
+    var fields: String?
+
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
@@ -40,7 +43,11 @@ struct OpenCommand: AsyncParsableCommand {
                 url: url.absoluteString,
                 opened: opened
             )
-            let output = try JSONOutputFormatter.format(response, forcePretty: pretty)
+            let output = try JSONOutputFormatter.format(
+                response,
+                forcePretty: pretty,
+                fields: fields
+            )
             print(output)
         } catch let error as CLIError {
             StderrOutput().writeLine(error.message)

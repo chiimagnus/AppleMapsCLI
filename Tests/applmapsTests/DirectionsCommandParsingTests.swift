@@ -10,6 +10,7 @@ struct DirectionsCommandParsingTests {
             "--to", "San Francisco",
             "--mode", "walking",
             "--alternatives",
+            "--fields", "routes",
             "--pretty"
         ])
 
@@ -17,6 +18,7 @@ struct DirectionsCommandParsingTests {
         #expect(parsed.to == "San Francisco")
         #expect(parsed.mode == "walking")
         #expect(parsed.alternatives)
+        #expect(parsed.fields == "routes")
         #expect(parsed.pretty)
     }
 

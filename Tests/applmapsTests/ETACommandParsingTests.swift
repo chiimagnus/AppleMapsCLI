@@ -10,12 +10,14 @@ struct ETACommandParsingTests {
             "--to", "Oakland",
             "--to", "San Jose",
             "--mode", "walking",
+            "--fields", "destination,travel_time_s",
             "--pretty"
         ])
 
         #expect(parsed.from == "San Francisco")
         #expect(parsed.to == ["Oakland", "San Jose"])
         #expect(parsed.mode == "walking")
+        #expect(parsed.fields == "destination,travel_time_s")
         #expect(parsed.pretty)
     }
 

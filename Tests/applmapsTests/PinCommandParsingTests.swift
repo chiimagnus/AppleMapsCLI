@@ -17,12 +17,26 @@ struct PinCommandParsingTests {
         #expect(!parsed.pretty)
     }
 
+    @Test("Parses fields option before coordinates")
+    func fieldsBeforeCoordinates() throws {
+        let parsed = try PinCommand.parse([
+            "--fields",
+            "url",
+            "37.78",
+            "-122.41"
+        ])
+
+        #expect(parsed.fields == "url")
+        #expect(parsed.coordinates == ["37.78", "-122.41"])
+    }
+
     @Test("Resolves trailing label and pretty from passthrough tokens")
     func resolveTrailingOptions() throws {
         let resolved = try PinCommand.parseInputs(
             tokens: ["37.78", "-122.41", "--label", "Office", "--pretty"],
             defaultLabel: nil,
-            defaultPretty: false
+            defaultPretty: false,
+            defaultFields: nil
         )
 
         #expect(resolved.coordinate == Coordinate(lat: 37.78, lon: -122.41))
@@ -35,9 +49,22 @@ struct PinCommandParsingTests {
         let resolved = try PinCommand.parseInputs(
             tokens: ["-37.78", "-122.41"],
             defaultLabel: nil,
-            defaultPretty: false
+            defaultPretty: false,
+            defaultFields: nil
         )
 
         #expect(resolved.coordinate == Coordinate(lat: -37.78, lon: -122.41))
+    }
+
+    @Test("Resolves trailing fields option from passthrough tokens")
+    func resolveTrailingFields() throws {
+        let resolved = try PinCommand.parseInputs(
+            tokens: ["37.78", "-122.41", "--fields", "url,opened"],
+            defaultLabel: nil,
+            defaultPretty: false,
+            defaultFields: nil
+        )
+
+        #expect(resolved.fields == "url,opened")
     }
 }

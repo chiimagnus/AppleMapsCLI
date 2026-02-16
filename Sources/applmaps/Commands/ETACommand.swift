@@ -16,6 +16,9 @@ struct ETACommand: AsyncParsableCommand {
     @Option(name: .long, help: "Transport mode: driving, walking, transit, cycling")
     var mode: String = TransportMode.driving.rawValue
 
+    @Option(name: .long, help: "Comma-separated JSON fields to include in output")
+    var fields: String?
+
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
@@ -29,7 +32,11 @@ struct ETACommand: AsyncParsableCommand {
                 to: to,
                 mode: parsedMode
             )
-            let output = try JSONOutputFormatter.format(response, forcePretty: pretty)
+            let output = try JSONOutputFormatter.format(
+                response,
+                forcePretty: pretty,
+                fields: fields
+            )
             print(output)
         } catch let error as CLIError {
             StderrOutput().writeLine(error.message)

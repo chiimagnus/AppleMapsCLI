@@ -17,6 +17,9 @@ struct PinCommand: AsyncParsableCommand {
     @Option(name: .long, help: "Optional pin label")
     var label: String?
 
+    @Option(name: .long, help: "Comma-separated JSON fields to include in output")
+    var fields: String?
+
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
@@ -25,7 +28,8 @@ struct PinCommand: AsyncParsableCommand {
             let parsed = try Self.parseInputs(
                 tokens: coordinates,
                 defaultLabel: label,
-                defaultPretty: pretty
+                defaultPretty: pretty,
+                defaultFields: fields
             )
 
             let url = try MapsURLBuilder.pin(
@@ -39,7 +43,11 @@ struct PinCommand: AsyncParsableCommand {
                 url: url.absoluteString,
                 opened: opened
             )
-            let output = try JSONOutputFormatter.format(response, forcePretty: parsed.pretty)
+            let output = try JSONOutputFormatter.format(
+                response,
+                forcePretty: parsed.pretty,
+                fields: parsed.fields
+            )
             print(output)
         } catch let error as CLIError {
             StderrOutput().writeLine(error.message)
@@ -68,10 +76,12 @@ struct PinCommand: AsyncParsableCommand {
     static func parseInputs(
         tokens: [String],
         defaultLabel: String?,
-        defaultPretty: Bool
-    ) throws -> (coordinate: Coordinate, label: String?, pretty: Bool) {
+        defaultPretty: Bool,
+        defaultFields: String?
+    ) throws -> (coordinate: Coordinate, label: String?, pretty: Bool, fields: String?) {
         var resolvedLabel = defaultLabel
         var resolvedPretty = defaultPretty
+        var resolvedFields = defaultFields
         var coordinateTokens: [String] = []
 
         var index = 0
@@ -88,6 +98,12 @@ struct PinCommand: AsyncParsableCommand {
             case "--pretty":
                 resolvedPretty = true
                 index += 1
+            case "--fields":
+                guard index + 1 < tokens.count else {
+                    throw CLIError.user("Flag --fields requires a value.")
+                }
+                resolvedFields = tokens[index + 1]
+                index += 2
             default:
                 coordinateTokens.append(token)
                 index += 1
@@ -114,6 +130,6 @@ struct PinCommand: AsyncParsableCommand {
             throw CLIError.user("Longitude must be between -180 and 180.")
         }
 
-        return (Coordinate(lat: lat, lon: lon), resolvedLabel, resolvedPretty)
+        return (Coordinate(lat: lat, lon: lon), resolvedLabel, resolvedPretty, resolvedFields)
     }
 }

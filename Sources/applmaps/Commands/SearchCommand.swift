@@ -19,6 +19,9 @@ struct SearchCommand: AsyncParsableCommand {
     @Option(name: .long, help: "Maximum number of results to return")
     var limit: Int = 10
 
+    @Option(name: .long, help: "Comma-separated JSON fields to include in output")
+    var fields: String?
+
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
@@ -42,7 +45,11 @@ struct SearchCommand: AsyncParsableCommand {
                 radiusMeters: radius,
                 limit: limit
             )
-            let output = try JSONOutputFormatter.format(response, forcePretty: pretty)
+            let output = try JSONOutputFormatter.format(
+                response,
+                forcePretty: pretty,
+                fields: fields
+            )
             print(output)
         } catch let error as CLIError {
             StderrOutput().writeLine(error.message)

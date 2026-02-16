@@ -7,10 +7,12 @@ struct GeocodeCommandParsingTests {
     func parseAddress() throws {
         let parsed = try GeocodeCommand.parse([
             "1 Apple Park Way",
+            "--fields", "coordinate",
             "--pretty"
         ])
 
         #expect(parsed.address == "1 Apple Park Way")
+        #expect(parsed.fields == "coordinate")
         #expect(parsed.pretty)
         #expect(!parsed.stdin)
     }
