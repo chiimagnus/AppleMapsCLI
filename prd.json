@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "project": "applmaps",
+    "source": "prd.md",
+    "generated_at": "2026-02-16T00:00:00Z",
+    "version": "1.0"
+  },
+  "stories": [
+    {
+      "id": "S01",
+      "title": "Geocode command",
+      "phase": 1,
+      "priority": "P0",
+      "description": "As a developer, I want to geocode addresses so I can get coordinates for my dataset.",
+      "requirements": [
+        "Implement geocode command with single address input",
+        "Return JSON with coordinate, formatted address, timezone",
+        "Handle no results with exit code 3"
+      ],
+      "acceptance": [
+        "applmaps geocode \"Apple Park\" returns valid JSON"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S02",
+      "title": "Reverse geocode command",
+      "phase": 1,
+      "priority": "P0",
+      "description": "As a scripter, I want to reverse geocode coordinates so I can display human-readable locations.",
+      "requirements": [
+        "Implement reverse command accepting lat/lon arguments",
+        "Return Address object with all fields"
+      ],
+      "acceptance": [
+        "applmaps reverse 37.33 -122.01 returns address"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S03",
+      "title": "Search command",
+      "phase": 1,
+      "priority": "P0",
+      "description": "As an agent, I want to search for nearby places so I can find businesses programmatically.",
+      "requirements": [
+        "Implement search with query and optional near/radius/limit",
+        "Return array of Place objects with documented fields"
+      ],
+      "acceptance": [
+        "applmaps search \"restaurants\" --near \"40.71,-74.00\" --limit 5"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S04",
+      "title": "ETA command",
+      "phase": 1,
+      "priority": "P1",
+      "description": "As a scripter, I want to get travel time estimates so I can optimize routes.",
+      "requirements": [
+        "Implement eta command with from/to arguments",
+        "Support multiple to destinations"
+      ],
+      "acceptance": [
+        "applmaps eta --from \"SF\" --to \"Oakland\" --to \"SJC\""
+      ],
+      "passes": false
+    },
+    {
+      "id": "S05",
+      "title": "Directions command",
+      "phase": 2,
+      "priority": "P0",
+      "description": "As a developer, I want full route directions so I can display turn-by-turn navigation.",
+      "requirements": [
+        "Implement directions with from/to and transport mode",
+        "Return Route array with steps, distance, duration"
+      ],
+      "acceptance": [
+        "applmaps directions --from \"Cupertino\" --to \"SF\" --mode driving"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S06",
+      "title": "Batch geocode stdin mode",
+      "phase": 2,
+      "priority": "P0",
+      "description": "As a scripter, I want to batch geocode addresses so I can process large datasets.",
+      "requirements": [
+        "Add stdin mode to geocode",
+        "Process one address per line sequentially"
+      ],
+      "acceptance": [
+        "cat addresses.txt | applmaps geocode --stdin"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S07",
+      "title": "Open maps command",
+      "phase": 2,
+      "priority": "P1",
+      "description": "As a user, I want to open Maps at a specific location so I can visualize programmatically.",
+      "requirements": [
+        "Implement open with search/location/directions modes",
+        "Construct and dispatch proper maps URLs"
+      ],
+      "acceptance": [
+        "applmaps open --location \"37.78,-122.41\" --zoom 14"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S08",
+      "title": "Pin command",
+      "phase": 2,
+      "priority": "P1",
+      "description": "As a developer, I want to drop labeled pins so I can mark specific points.",
+      "requirements": [
+        "Implement pin with coordinate and optional label"
+      ],
+      "acceptance": [
+        "applmaps pin 37.78 -122.41 --label \"Office\""
+      ],
+      "passes": false
+    },
+    {
+      "id": "S09",
+      "title": "MCP server mode",
+      "phase": 3,
+      "priority": "P1",
+      "description": "As an AI agent, I want structured tool schemas so I can discover capabilities.",
+      "requirements": [
+        "Implement applmaps mcp mode",
+        "Expose commands as typed MCP tools"
+      ],
+      "acceptance": [
+        "Claude Desktop can call applmaps tools via MCP"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S10",
+      "title": "Fields projection",
+      "phase": 3,
+      "priority": "P0",
+      "description": "As an agent, I want field projection so I can minimize token usage.",
+      "requirements": [
+        "Implement fields flag for all commands",
+        "Support comma-separated field list"
+      ],
+      "acceptance": [
+        "applmaps search \"coffee\" --fields name,coordinate"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S11",
+      "title": "Shell completions",
+      "phase": 3,
+      "priority": "P1",
+      "description": "As a scripter, I want shell completions so I can use the tool efficiently.",
+      "requirements": [
+        "Generate zsh/bash/fish completions"
+      ],
+      "acceptance": [
+        "Tab completion works for commands and flags"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S12",
+      "title": "JSON schema export",
+      "phase": 3,
+      "priority": "P1",
+      "description": "As a developer, I want JSON schema export so I can validate outputs.",
+      "requirements": [
+        "Implement json-schema export flag",
+        "Export input/output schema per command"
+      ],
+      "acceptance": [
+        "Agents can ingest schema for self-documentation"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S13",
+      "title": "Search autocomplete",
+      "phase": 4,
+      "priority": "P2",
+      "description": "As a developer, I want search autocomplete so I can build type-ahead UIs.",
+      "requirements": [
+        "Implement complete command for search query completion"
+      ],
+      "acceptance": [
+        "applmaps complete \"star\" returns autocomplete suggestions"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S14",
+      "title": "Categories command",
+      "phase": 4,
+      "priority": "P2",
+      "description": "As a user, I want to list POI categories so I know available filters.",
+      "requirements": [
+        "Implement categories command returning MKPointOfInterestCategory values"
+      ],
+      "acceptance": [
+        "applmaps categories --format table"
+      ],
+      "passes": false
+    },
+    {
+      "id": "S15",
+      "title": "Server backend option",
+      "phase": 4,
+      "priority": "P2",
+      "description": "As an enterprise user, I want to use the REST API backend for higher quotas.",
+      "requirements": [
+        "Implement backend server option",
+        "Support Apple Maps Server API with API key config"
+      ],
+      "acceptance": [
+        "applmaps search \"coffee\" --backend server"
+      ],
+      "passes": false
+    }
+  ]
+}

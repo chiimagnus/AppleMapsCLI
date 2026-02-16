@@ -1,0 +1,134 @@
+# applmaps — Development Progress Log
+
+This file tracks iteration-by-iteration progress for autonomous development agents.
+Each iteration reads the last 30 lines to understand current project state.
+
+---
+
+## Iteration 0 — Project Initialization
+Date: 2025-02-15T00:00:00Z
+Agent: Human (manual setup)
+
+### Summary
+Initial project scaffolding and documentation for autonomous development.
+Established architecture, rules, and agent workflow for fully autonomous TCR-based development.
+
+### Project Structure Created
+```
+applmaps/
+├── AGENTS.md              # Permanent project rules and architecture
+├── PROMPT.md             # Per-iteration autonomous agent instructions
+├── AUTONOMOUS.md         # Quick start guide for kicking off agents
+├── prd.md                # Product requirements (source of truth)
+├── prd.json              # Story backlog (to be generated from prd.md)
+├── progress.txt          # This file
+├── .agents/
+│   └── skills/
+│       └── swift6/
+│           └── SKILL.md  # Swift 6 reference (external, to be fetched)
+├── Package.swift         # To be created by first agent iteration
+├── Sources/
+│   └── ApplMaps/         # To be created
+└── Tests/
+    └── ApplMapsTests/    # To be created
+```
+
+### Key Technical Decisions
+- **Platform:** macOS 13+ (Ventura) for async/await MapKit support
+- **Language:** Swift 6.2.3 with strict concurrency enabled
+- **Testing:** Swift Testing framework (NOT XCTest)
+- **CLI Framework:** Swift Argument Parser 1.5+
+- **VCS:** Jujutsu (jj) for TCR workflow
+- **Backend:** Native MapKit/CoreLocation (no API keys required)
+- **Output:** JSON-first, snake_case keys, compact when piped, pretty for TTY
+
+### Architecture Boundaries (AGENTS.md §5)
+```
+Utilities/ → Core/ → Output/ → Commands/ → @main
+```
+- **Utilities:** Shared helpers, parsing, error types (all Sendable)
+- **Core:** MapKit/CoreLocation wrappers, data models, service protocols
+- **Output:** JSON/text/table formatters
+- **Commands:** ArgumentParser command definitions, CLI routing
+
+### Semantic Exit Codes (AGENTS.md §3)
+- `0` — Success
+- `1` — User error (invalid args, bad coordinates)
+- `2` — Network/API error (MapKit failures, throttling)
+- `3` — No results found
+
+### Commands to Implement (prd.md Phase 1-4)
+**Phase 1 (Stories S01-S04):**
+- `geocode` — Forward geocoding (address → coordinates)
+- `reverse` — Reverse geocoding (coordinates → address)
+- `search` — Place/POI search with filters
+- `eta` — Travel time estimation (lightweight)
+
+**Phase 2 (Stories S05-S08):**
+- `directions` — Full route calculation with steps
+- `open` — Open Maps.app via maps:// URL
+- `pin` — Drop labeled pin in Maps.app
+
+**Phase 3 (Stories S09-S12):**
+- MCP server mode for AI agent integration
+- `--fields` projection for token optimization
+- Shell completions (zsh/bash/fish)
+
+**Phase 4 (Stories S13-S15):**
+- Search autocomplete
+- POI category listing
+- Optional Maps Server API backend
+
+### Initial Gotchas & Patterns
+*(None yet — first autonomous agent will populate AGENTS.md §13)*
+
+### Next Steps for First Autonomous Agent
+1. Generate prd.json from prd.md (stories with ids, acceptance criteria, passes: false)
+2. Create Package.swift with swift-argument-parser dependency
+3. Create initial directory structure (Sources/ApplMaps, Tests/ApplMapsTests)
+4. Fetch Swift 6 skill document to .agents/skills/swift6/SKILL.md
+5. Begin Story S01 (geocode command) following PROMPT.md phases
+
+### Important Notes for Agents
+- **All models must be Sendable** — This is Swift 6 strict concurrency
+- **Use Swift Testing** — `@Test` and `#expect`, NOT XCTest
+- **TCR discipline is mandatory** — Never commit code that doesn't build/test
+- **CLGeocoder batching** — Process sequentially, not parallel (Apple guidance)
+- **MapKit rate limiting** — Implement exponential backoff (1s, 2s, 4s)
+- **No logging of coordinates/addresses** — Privacy first (only under --verbose)
+- **JSON output must be stable** — Breaking changes require version bump
+
+### Documentation References
+- Swift 6 patterns: `.agents/skills/swift6/SKILL.md` (external)
+- Project rules: `AGENTS.md`
+- Iteration protocol: `PROMPT.md`
+- Kickoff instructions: `AUTONOMOUS.md`
+- Full requirements: `prd.md`
+- Story backlog: `prd.json` (to be generated)
+
+### Agent Autonomy Level
+**FULL AUTONOMY ENABLED**
+- Proceed without asking permission
+- Add dependencies, modify Package.swift as needed
+- Create files following architecture rules
+- Make technical decisions using AGENTS.md guidance
+- Only stop on repeated test failures or environment issues
+
+---
+
+## Instructions for Next Agent
+
+**You are the first autonomous development iteration.**
+
+1. Read AGENTS.md (especially §0 Swift 6 skill reference and §5 architecture)
+2. Read PROMPT.md (follow all 6 phases exactly)
+3. Generate prd.json from prd.md (use jq or implement converter)
+4. Create Package.swift (Swift 6.0, macOS 13+, swift-argument-parser 1.5+)
+5. Verify: `swift build` should succeed (even with empty project)
+6. Begin Story S01: Implement geocode command
+7. Follow TCR discipline: small commits, all tests pass
+8. Document any discoveries in AGENTS.md §13
+
+**Full permission granted. Execute immediately. Good luck!**
+
+---
