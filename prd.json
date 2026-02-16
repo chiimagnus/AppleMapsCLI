@@ -110,7 +110,7 @@
       "acceptance": [
         "applmaps open --location \"37.78,-122.41\" --zoom 14"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S08",

@@ -223,3 +223,25 @@ Date: 2026-02-16T07:20:23Z
 - Manual smoke checks:
   - `printf 'Apple Park\n1 Infinite Loop\n' | .build/debug/applmaps geocode --stdin` executes batch flow and maps live geocoding network failure to exit `2` in this environment.
   - `.build/debug/applmaps geocode --stdin "Apple Park"` exits `1` with usage validation.
+
+## Iteration 7 — S07-open-maps-command — Open maps command
+Date: 2026-02-16T07:23:40Z
+- Implemented `open` command with search/location/directions modes.
+- Added `MapsURLBuilder` core utility for deterministic maps URL construction:
+  - search (`q`)
+  - location (`ll` + optional `z`)
+  - directions (`saddr`/`daddr` + `dirflg`)
+- Added `OpenResponse` JSON model (`action`, `url`, `opened`) and wired command output through shared formatter.
+- Added mode validation and exclusivity checks for `--search`, `--location`, and `--from/--to` usage.
+- Added deterministic tests:
+  - `MapsURLBuilderTests`
+  - `OpenCommandParsingTests`
+- Wired `OpenCommand` into root command tree (`applmaps open`).
+- Verified with:
+  - `swift build --disable-sandbox`
+  - `swift build -c release --disable-sandbox`
+  - `swift test --disable-sandbox --verbose`
+- Manual smoke checks:
+  - `.build/debug/applmaps open --help` shows expected usage and flags.
+  - `.build/debug/applmaps open --location "37.78,-122.41" --zoom 14` returns JSON with constructed URL and `opened` status.
+  - `.build/debug/applmaps open --search "coffee" --location "37.78,-122.41"` exits `1` with mode exclusivity validation.
