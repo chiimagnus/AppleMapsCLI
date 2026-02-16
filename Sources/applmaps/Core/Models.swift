@@ -15,6 +15,24 @@ struct Address: Sendable, Codable, Equatable {
     let isoCountry: String?
     let formatted: String
 
+    init(
+        street: String?,
+        city: String?,
+        state: String?,
+        zip: String?,
+        country: String?,
+        isoCountry: String?,
+        formatted: String
+    ) {
+        self.street = street
+        self.city = city
+        self.state = state
+        self.zip = zip
+        self.country = country
+        self.isoCountry = isoCountry
+        self.formatted = formatted
+    }
+
     init(placemark: CLPlacemark) {
         street = Address.streetLine(from: placemark)
         city = placemark.locality?.nilIfEmpty
@@ -57,6 +75,18 @@ struct GeocodeResult: Sendable, Codable, Equatable {
     let address: Address
     let timezone: String?
     let areasOfInterest: [String]
+
+    init(
+        coordinate: Coordinate,
+        address: Address,
+        timezone: String?,
+        areasOfInterest: [String]
+    ) {
+        self.coordinate = coordinate
+        self.address = address
+        self.timezone = timezone
+        self.areasOfInterest = areasOfInterest
+    }
 
     init?(placemark: CLPlacemark) {
         guard let location = placemark.location else {
