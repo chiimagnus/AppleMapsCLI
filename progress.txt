@@ -204,3 +204,22 @@ Date: 2026-02-16T06:55:58Z
   - `.build/debug/applmaps directions --help` shows expected usage and flags.
   - `.build/debug/applmaps directions --from "Cupertino" --to "SF" --mode teleport` exits `1` with mode validation.
   - `.build/debug/applmaps directions --from "Cupertino" --to "SF" --mode driving` executes and maps live `MKErrorDomain error 1` to exit `2` in this environment.
+
+## Iteration 6 — S06-batch-geocode-stdin — Batch geocode stdin mode
+Date: 2026-02-16T07:20:23Z
+- Added `--stdin` mode to `geocode` for batch processing (one address per line, sequential execution).
+- Added batch geocode models (`BatchGeocodeResult`, `BatchGeocodeResponse`) and `BatchGeocodeRunner` that reuses a single geocoding service instance.
+- Updated `GeocodeCommand` to support two paths:
+  - positional address mode (existing)
+  - `--stdin` mode (new)
+- Added input validation for mutually exclusive usage (`--stdin` with positional address) and missing input.
+- Added deterministic tests:
+  - `BatchGeocodeRunnerTests`
+  - `GeocodeCommandParsingTests`
+- Verified with:
+  - `swift build --disable-sandbox`
+  - `swift build -c release --disable-sandbox`
+  - `swift test --disable-sandbox --verbose`
+- Manual smoke checks:
+  - `printf 'Apple Park\n1 Infinite Loop\n' | .build/debug/applmaps geocode --stdin` executes batch flow and maps live geocoding network failure to exit `2` in this environment.
+  - `.build/debug/applmaps geocode --stdin "Apple Park"` exits `1` with usage validation.

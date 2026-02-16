@@ -95,7 +95,7 @@
       "acceptance": [
         "cat addresses.txt | applmaps geocode --stdin"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S07",
