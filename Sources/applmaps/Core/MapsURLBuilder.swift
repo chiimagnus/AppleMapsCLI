@@ -60,6 +60,19 @@ enum MapsURLBuilder {
         ])
     }
 
+    static func pin(coordinate: Coordinate, label: String?) throws -> URL {
+        let trimmedLabel = label?.trimmingCharacters(in: .whitespacesAndNewlines)
+        var items = [
+            URLQueryItem(name: "ll", value: "\(coordinate.lat),\(coordinate.lon)")
+        ]
+
+        if let trimmedLabel, !trimmedLabel.isEmpty {
+            items.append(URLQueryItem(name: "q", value: trimmedLabel))
+        }
+
+        return try buildURL(queryItems: items)
+    }
+
     private static func buildURL(queryItems: [URLQueryItem]) throws -> URL {
         var components = URLComponents()
         components.scheme = "https"

@@ -40,4 +40,22 @@ struct MapsURLBuilderTests {
             )
         }
     }
+
+    @Test("Builds pin URL with label")
+    func pinURLWithLabel() throws {
+        let url = try MapsURLBuilder.pin(
+            coordinate: Coordinate(lat: 37.78, lon: -122.41),
+            label: "Office"
+        )
+        #expect(url.absoluteString == "https://maps.apple.com?ll=37.78,-122.41&q=Office")
+    }
+
+    @Test("Builds pin URL without label")
+    func pinURLWithoutLabel() throws {
+        let url = try MapsURLBuilder.pin(
+            coordinate: Coordinate(lat: 37.78, lon: -122.41),
+            label: nil
+        )
+        #expect(url.absoluteString == "https://maps.apple.com?ll=37.78,-122.41")
+    }
 }
