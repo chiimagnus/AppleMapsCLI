@@ -8,11 +8,12 @@ struct CompletionsCommand: ParsableCommand {
     )
 
     @Argument(help: "Shell type: zsh, bash, fish")
-    var shell: Shell
+    var shell: String
 
     mutating func run() throws {
         do {
-            let script = try Self.generateScript(shell: shell)
+            let parsedShell = try Self.parseShell(rawValue: shell)
+            let script = try Self.generateScript(shell: parsedShell)
             if script.hasSuffix("\n") {
                 print(script, terminator: "")
             } else {
@@ -67,10 +68,18 @@ struct CompletionsCommand: ParsableCommand {
 
         return script
     }
+
+    static func parseShell(rawValue: String) throws -> Shell {
+        let normalized = rawValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard let shell = Shell(rawValue: normalized) else {
+            throw CLIError.user("Shell must be one of: zsh, bash, fish.")
+        }
+        return shell
+    }
 }
 
 extension CompletionsCommand {
-    enum Shell: String, ExpressibleByArgument, CaseIterable, Sendable {
+    enum Shell: String, CaseIterable, Sendable {
         case zsh
         case bash
         case fish

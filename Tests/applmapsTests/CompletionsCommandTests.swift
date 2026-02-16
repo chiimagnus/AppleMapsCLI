@@ -7,19 +7,26 @@ struct CompletionsCommandParsingTests {
     @Test("Parses zsh shell argument")
     func parseZsh() throws {
         let parsed = try CompletionsCommand.parse(["zsh"])
-        #expect(parsed.shell == .zsh)
+        #expect(parsed.shell == "zsh")
     }
 
     @Test("Parses bash shell argument")
     func parseBash() throws {
         let parsed = try CompletionsCommand.parse(["bash"])
-        #expect(parsed.shell == .bash)
+        #expect(parsed.shell == "bash")
     }
 
     @Test("Parses fish shell argument")
     func parseFish() throws {
         let parsed = try CompletionsCommand.parse(["fish"])
-        #expect(parsed.shell == .fish)
+        #expect(parsed.shell == "fish")
+    }
+
+    @Test("Rejects unsupported shell names at runtime validation")
+    func rejectsUnsupportedShell() {
+        #expect(throws: CLIError.user("Shell must be one of: zsh, bash, fish.")) {
+            _ = try CompletionsCommand.parseShell(rawValue: "powershell")
+        }
     }
 }
 
