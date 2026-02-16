@@ -25,6 +25,8 @@ struct GeocodeRunner: Sendable {
             case .noResults:
                 throw CLIError.noResults("No geocoding results found.")
             }
+        } catch let error as CLIError {
+            throw error
         } catch {
             throw CLIError.network("Unexpected geocoding error: \(error.localizedDescription)")
         }
