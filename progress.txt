@@ -155,3 +155,16 @@ Date: 2026-02-16T06:17:44Z
   - `.build/debug/applmaps reverse 37.3349 -122.0090` -> JSON payload, exit `0`
   - `.build/debug/applmaps reverse 100 0` -> validation message, exit `1`
 - Added S02 discovery to `AGENTS.md §13` for signed-coordinate parsing with ArgumentParser.
+
+## Iteration 3 — S03-search-command — Search command
+Date: 2026-02-16T06:24:44Z
+- Implemented `search` command with query input and optional `--near`, `--radius`, and `--limit` flags.
+- Added search domain models (`Place`, `SearchResponse`) and coordinate string parsing (`Coordinate(string:)`) for command validation.
+- Added `SearchService` + `MapKitSearchService` and `SearchRunner` with semantic error mapping to CLI exits (`1`, `2`, `3`).
+- Wired `SearchCommand` into root CLI (`applmaps search`) and ensured snake_case JSON output via shared formatter.
+- Added deterministic tests for search runner behavior, search command parsing, and coordinate parsing.
+- Verified with `swift build --disable-sandbox`, `swift build -c release --disable-sandbox`, and `swift test --disable-sandbox --verbose`.
+- Manual command checks:
+  - `.build/debug/applmaps search --help` shows expected flags and usage.
+  - `.build/debug/applmaps search "coffee" --near "invalid"` returns exit `1` with actionable validation error.
+  - Live MapKit search requests in this environment returned `MKErrorDomain error 1` and correctly mapped to exit `2`.

@@ -50,7 +50,7 @@
       "acceptance": [
         "applmaps search \"restaurants\" --near \"40.71,-74.00\" --limit 5"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S04",
