@@ -564,6 +564,12 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Discovery:** Swift reported `'main' attribute cannot be used in a module that contains top-level code`.
 **Pattern:** Use `@main` in a non-`main.swift` file (e.g., `ApplMaps.swift`) for executable targets with multiple source files.
 
+### Negative Coordinate Parsing — Use passthrough positional capture
+**Discovered in:** Iteration 2, Story S02
+**Context:** `applmaps reverse 37.3349 -122.0090` parsed `-122.0090` as an option instead of a positional value.
+**Discovery:** Swift Argument Parser treats dash-prefixed positionals as options under default positional parsing.
+**Pattern:** For commands that accept signed numeric positional values, capture coordinates as `@Argument(parsing: .captureForPassthrough) [String]` and parse/validate manually in the command or runner.
+
 ### MapKit Rate Limiting — Handle throttling gracefully
 **Context:** Placeholder for future discoveries during implementation
 **Pattern:** When implemented, document retry strategies here
