@@ -65,7 +65,7 @@
       "acceptance": [
         "applmaps eta --from \"SF\" --to \"Oakland\" --to \"SJC\""
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S05",

@@ -570,6 +570,12 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Discovery:** Swift Argument Parser treats dash-prefixed positionals as options under default positional parsing.
 **Pattern:** For commands that accept signed numeric positional values, capture coordinates as `@Argument(parsing: .captureForPassthrough) [String]` and parse/validate manually in the command or runner.
 
+### MapKit ETA Response Type — Use Swift name `MKDirections.ETAResponse`
+**Discovered in:** Iteration 4, Story S04
+**Context:** Implementing the `eta` command service with `MKDirections.calculateETA()`.
+**Discovery:** The Objective-C type `MKETAResponse` is obsoleted in Swift and renamed to `MKDirections.ETAResponse`; using `MKETAResponse` fails compilation on Swift 6.
+**Pattern:** In Swift code and signatures, use `MKDirections.ETAResponse` for ETA responses from MapKit.
+
 ### MapKit Rate Limiting — Handle throttling gracefully
 **Context:** Placeholder for future discoveries during implementation
 **Pattern:** When implemented, document retry strategies here

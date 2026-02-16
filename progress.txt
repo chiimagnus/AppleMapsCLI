@@ -168,3 +168,20 @@ Date: 2026-02-16T06:24:44Z
   - `.build/debug/applmaps search --help` shows expected flags and usage.
   - `.build/debug/applmaps search "coffee" --near "invalid"` returns exit `1` with actionable validation error.
   - Live MapKit search requests in this environment returned `MKErrorDomain error 1` and correctly mapped to exit `2`.
+
+## Iteration 4 — S04-eta-command — ETA command
+Date: 2026-02-16T06:42:14Z
+- Implemented `eta` command with required `--from` and repeatable `--to` arguments, plus optional `--mode` and `--pretty` flags.
+- Added ETA domain models (`TransportMode`, `ETAResult`, `ETAResponse`) and `ETARunner` validation/error mapping to semantic CLI exits.
+- Added `ETAService` contract and `MapKitETAService` actor using `MKLocalSearch` location resolution and `MKDirections.calculateETA()` for per-destination ETA results.
+- Added deterministic parsing and runner tests: `ETACommandParsingTests` and `ETARunnerTests`.
+- Wired `ETACommand` into root CLI command tree (`applmaps eta`).
+- Documented S04 discovery in `AGENTS.md §13`: use `MKDirections.ETAResponse` in Swift.
+- Verified with:
+  - `swift build --disable-sandbox`
+  - `swift build -c release --disable-sandbox`
+  - `swift test --disable-sandbox --verbose`
+- Manual smoke checks:
+  - `.build/debug/applmaps eta --help` shows expected usage and flags.
+  - `.build/debug/applmaps eta --from "SF" --mode driving` exits `1` with destination validation.
+  - `.build/debug/applmaps eta --from "SF" --to "Oakland" --to "SJC"` executes and maps live `MKErrorDomain error 1` to exit `2` in this environment.
