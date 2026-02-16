@@ -543,6 +543,27 @@ This section accumulates learnings from implementation iterations. When you disc
 
 ---
 
+### ArgumentParser Subcommand Names — Set commandName explicitly
+**Discovered in:** Iteration 1, Story S01
+**Context:** `applmaps geocode "Apple Park"` was rejected even though `GeocodeCommand` was registered as a subcommand.
+**Discovery:** ArgumentParser did not expose the intended CLI token from the type name in this setup.
+**Pattern:** Always set `commandName` in each command's `CommandConfiguration`.
+
+```swift
+struct GeocodeCommand: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "geocode",
+        abstract: "Convert an address into geographic coordinates."
+    )
+}
+```
+
+### Swift Entrypoint File Name — Avoid `@main` in `main.swift` for multi-file targets
+**Discovered in:** Iteration 1, Story S01
+**Context:** Build failed after adding more source files with `@main` still inside `Sources/.../main.swift`.
+**Discovery:** Swift reported `'main' attribute cannot be used in a module that contains top-level code`.
+**Pattern:** Use `@main` in a non-`main.swift` file (e.g., `ApplMaps.swift`) for executable targets with multiple source files.
+
 ### MapKit Rate Limiting — Handle throttling gracefully
 **Context:** Placeholder for future discoveries during implementation
 **Pattern:** When implemented, document retry strategies here
