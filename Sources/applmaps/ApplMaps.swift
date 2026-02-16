@@ -10,7 +10,8 @@ struct ApplMaps: AsyncParsableCommand {
             ReverseCommand.self,
             SearchCommand.self,
             DirectionsCommand.self,
-            ETACommand.self
+            ETACommand.self,
+            OpenCommand.self
         ]
     )
 }
