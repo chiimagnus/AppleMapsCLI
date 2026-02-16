@@ -208,6 +208,30 @@ struct SearchResponse: Sendable, Codable, Equatable {
     let results: [Place]
 }
 
+enum TransportMode: String, Sendable, Codable, Equatable, CaseIterable {
+    case driving
+    case walking
+    case transit
+    case cycling
+}
+
+struct ETAResult: Sendable, Codable, Equatable {
+    let destination: String
+    let coordinate: Coordinate
+    let transportType: String
+    let distanceM: Double
+    let distanceText: String
+    let travelTimeS: Double
+    let travelTimeText: String
+    let expectedArrival: String?
+}
+
+struct ETAResponse: Sendable, Codable, Equatable {
+    let from: String
+    let count: Int
+    let results: [ETAResult]
+}
+
 private extension String {
     var nilIfEmpty: String? {
         let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
