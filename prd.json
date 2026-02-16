@@ -168,7 +168,7 @@
       "acceptance": [
         "Agents can ingest schema for self-documentation"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S12",

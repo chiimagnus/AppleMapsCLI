@@ -301,3 +301,27 @@ Date: 2026-02-16T07:40:48Z
   - `.build/debug/applmaps completions bash` outputs bash registration line and exits `0`.
   - `.build/debug/applmaps completions fish` outputs fish `complete -c 'applmaps'` directives and exits `0`.
   - `.build/debug/applmaps completions powershell` exits `1` with actionable validation.
+
+## Iteration 11 — S11-json-schema-export — JSON schema export
+Date: 2026-02-16T07:49:40Z
+- Implemented `--json-schema` export across command surface: `geocode`, `reverse`, `search`, `directions`, `eta`, `open`, `pin`, and `completions`.
+- Added reusable schema infrastructure:
+  - `CommandSchemaRegistry` with per-command input/output schema documents.
+  - `CommandSchemaOutput` renderer integrated with shared JSON formatting (`snake_case`, `--pretty`, `--fields`).
+- Added schema-aware command behavior:
+  - Commands short-circuit execution on `--json-schema` and avoid MapKit/CoreLocation calls.
+  - Required runtime arguments now support schema-only invocation paths (e.g., `search --json-schema`, `directions --json-schema`).
+  - Passthrough coordinate commands (`reverse`, `pin`) support trailing `--json-schema` tokens.
+- Added deterministic test coverage:
+  - `CommandSchemaRegistryTests` for schema availability and shape checks.
+  - Parsing tests updated for `--json-schema` behavior across command suites.
+  - Existing suite remains green with schema pathways included.
+- Verified with:
+  - `swift build --disable-sandbox`
+  - `swift build -c release --disable-sandbox`
+  - `swift test --disable-sandbox --verbose`
+- Manual smoke checks:
+  - `.build/debug/applmaps search --json-schema` emits schema with `input`/`output` and exits `0`.
+  - `.build/debug/applmaps directions --json-schema` emits schema without requiring `--from/--to` and exits `0`.
+  - `.build/debug/applmaps completions --json-schema` emits schema document and exits `0`.
+  - `.build/debug/applmaps reverse 37.33 -122.01 --json-schema` emits reverse schema and exits `0`.

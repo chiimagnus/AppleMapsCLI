@@ -588,6 +588,12 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Discovery:** Swift ArgumentParser already provides stable script generation through `--generate-completion-script <shell>`.
 **Pattern:** Expose a user-facing command that delegates to the current executable with `--generate-completion-script`, then add explicit shell validation in command logic to preserve semantic exit codes (`1` for invalid shell).
 
+### Recursive Schema Nodes — Avoid self-recursive structs
+**Discovered in:** Iteration 11, Story S11
+**Context:** Building reusable JSON schema documents with nested `properties`, `items`, and `oneOf`.
+**Discovery:** A self-recursive value type (`struct` containing itself via optional fields) fails with Swift's infinite-size check.
+**Pattern:** Model recursive schema trees with a recursion-safe representation (`final class` or `indirect enum`) so Codable recursion compiles cleanly.
+
 ### MapKit ETA Response Type — Use Swift name `MKDirections.ETAResponse`
 **Discovered in:** Iteration 4, Story S04
 **Context:** Implementing the `eta` command service with `MKDirections.calculateETA()`.
