@@ -182,7 +182,7 @@
       "acceptance": [
         "applmaps complete \"star\" returns autocomplete suggestions"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S13",

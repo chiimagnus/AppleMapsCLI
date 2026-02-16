@@ -594,6 +594,12 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Discovery:** A self-recursive value type (`struct` containing itself via optional fields) fails with Swift's infinite-size check.
 **Pattern:** Model recursive schema trees with a recursion-safe representation (`final class` or `indirect enum`) so Codable recursion compiles cleanly.
 
+### MapKit Autocomplete Service — Prefer async service+runner mapping
+**Discovered in:** Iteration 12, Story S12
+**Context:** Implementing the `complete` command for query autocomplete suggestions.
+**Discovery:** Wrapping autocomplete behavior in a dedicated async core service keeps command code small, avoids callback/delegate complexity, and makes semantic exit mapping deterministic in tests.
+**Pattern:** Implement `SearchCompletionService` + `SearchCompletionRunner`, use `MKLocalSearch` with `.pointOfInterest` for suggestion candidates, dedupe by normalized `title|subtitle`, and map MapKit failures into `CLIError.network` / `CLIError.noResults` in the runner.
+
 ### MapKit ETA Response Type — Use Swift name `MKDirections.ETAResponse`
 **Discovered in:** Iteration 4, Story S04
 **Context:** Implementing the `eta` command service with `MKDirections.calculateETA()`.

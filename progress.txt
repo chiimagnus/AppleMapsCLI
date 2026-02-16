@@ -325,3 +325,24 @@ Date: 2026-02-16T07:49:40Z
   - `.build/debug/applmaps directions --json-schema` emits schema without requiring `--from/--to` and exits `0`.
   - `.build/debug/applmaps completions --json-schema` emits schema document and exits `0`.
   - `.build/debug/applmaps reverse 37.33 -122.01 --json-schema` emits reverse schema and exits `0`.
+
+## Iteration 12 — S12-search-autocomplete — Search autocomplete
+Date: 2026-02-16T08:00:25Z
+- Added autocomplete domain models (`SearchCompletion`, `SearchCompletionResponse`) and implemented a dedicated completion stack:
+  - `SearchCompletionService` protocol + `MapKitSearchCompletionService`
+  - `SearchCompletionRunner` with semantic CLI error mapping
+- Implemented new `complete` command:
+  - `applmaps complete <query>` with `--limit`, `--fields`, `--pretty`, and `--json-schema`
+  - Wired into root command tree (`ApplMaps`)
+- Added JSON schema support for `complete` in `CommandSchemaRegistry` and schema shape tests.
+- Added deterministic tests:
+  - `SearchCompletionRunnerTests`
+  - `CompleteCommandParsingTests`
+  - Updated `CommandSchemaRegistryTests` for `complete`
+- Verified with:
+  - `swift build --disable-sandbox`
+  - `swift build -c release --disable-sandbox`
+  - `swift test --disable-sandbox --verbose`
+- Manual smoke checks:
+  - `.build/debug/applmaps complete --json-schema` emits schema and exits `0`.
+  - `.build/debug/applmaps complete "star"` maps current environment MapKit failure to semantic network exit `2` (MKErrorDomain error 1).
