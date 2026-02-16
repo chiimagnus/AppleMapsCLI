@@ -32,8 +32,21 @@ struct OpenCommand: AsyncParsableCommand {
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
+    @Flag(name: .long, help: "Print command input/output JSON schema and exit")
+    var jsonSchema: Bool = false
+
     mutating func run() async throws {
         do {
+            if jsonSchema {
+                let output = try CommandSchemaOutput.render(
+                    command: "open",
+                    pretty: pretty,
+                    fields: fields
+                )
+                print(output)
+                return
+            }
+
             let action = try resolveAction()
             let url = try buildURL(for: action)
             let opened = await MainActor.run { NSWorkspace.shared.open(url) }

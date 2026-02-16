@@ -40,4 +40,10 @@ struct OpenCommandParsingTests {
         #expect(parsed.to == "San Francisco")
         #expect(parsed.mode == "walking")
     }
+
+    @Test("Parses schema flag")
+    func parseSchemaFlag() throws {
+        let parsed = try OpenCommand.parse(["--json-schema"])
+        #expect(parsed.jsonSchema)
+    }
 }

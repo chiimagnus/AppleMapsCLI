@@ -11,6 +11,7 @@ struct SearchCommandParsingTests {
             "--radius", "500",
             "--limit", "5",
             "--fields", "name,coordinate",
+            "--json-schema",
             "--pretty"
         ])
 
@@ -19,6 +20,7 @@ struct SearchCommandParsingTests {
         #expect(parsed.radius == 500)
         #expect(parsed.limit == 5)
         #expect(parsed.fields == "name,coordinate")
+        #expect(parsed.jsonSchema)
         #expect(parsed.pretty)
     }
 
@@ -28,5 +30,13 @@ struct SearchCommandParsingTests {
 
         #expect(parsed.query == "coffee")
         #expect(parsed.limit == 10)
+    }
+
+    @Test("Allows schema flag without positional query")
+    func schemaWithoutQuery() throws {
+        let parsed = try SearchCommand.parse(["--json-schema"])
+
+        #expect(parsed.query == nil)
+        #expect(parsed.jsonSchema)
     }
 }

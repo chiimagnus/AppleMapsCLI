@@ -31,4 +31,13 @@ struct ETACommandParsingTests {
         #expect(parsed.mode == "driving")
         #expect(parsed.to == ["Oakland"])
     }
+
+    @Test("Allows schema flag without origin and destinations")
+    func schemaWithoutEndpoints() throws {
+        let parsed = try ETACommand.parse(["--json-schema"])
+
+        #expect(parsed.from == nil)
+        #expect(parsed.to.isEmpty)
+        #expect(parsed.jsonSchema)
+    }
 }

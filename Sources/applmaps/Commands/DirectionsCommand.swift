@@ -8,10 +8,10 @@ struct DirectionsCommand: AsyncParsableCommand {
     )
 
     @Option(name: .long, help: "Origin location query or coordinate in 'lat,lon' format")
-    var from: String
+    var from: String?
 
     @Option(name: .long, help: "Destination location query or coordinate in 'lat,lon' format")
-    var to: String
+    var to: String?
 
     @Option(name: .long, help: "Transport mode: driving, walking, transit, cycling")
     var mode: String = TransportMode.driving.rawValue
@@ -25,10 +25,30 @@ struct DirectionsCommand: AsyncParsableCommand {
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
+    @Flag(name: .long, help: "Print command input/output JSON schema and exit")
+    var jsonSchema: Bool = false
+
     mutating func run() async throws {
         let runner = DirectionsRunner(directionsService: MapKitDirectionsService())
 
         do {
+            if jsonSchema {
+                let output = try CommandSchemaOutput.render(
+                    command: "directions",
+                    pretty: pretty,
+                    fields: fields
+                )
+                print(output)
+                return
+            }
+
+            guard let from, !from.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw CLIError.user("Directions requires --from unless using --json-schema.")
+            }
+            guard let to, !to.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw CLIError.user("Directions requires --to unless using --json-schema.")
+            }
+
             let parsedMode = try parseMode(mode)
             let response = try await runner.execute(
                 from: from,

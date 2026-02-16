@@ -23,17 +23,35 @@ struct PinCommand: AsyncParsableCommand {
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
+    @Flag(name: .long, help: "Print command input/output JSON schema and exit")
+    var jsonSchema: Bool = false
+
     mutating func run() async throws {
         do {
             let parsed = try Self.parseInputs(
                 tokens: coordinates,
                 defaultLabel: label,
                 defaultPretty: pretty,
-                defaultFields: fields
+                defaultFields: fields,
+                defaultJSONSchema: jsonSchema
             )
 
+            if parsed.jsonSchema {
+                let output = try CommandSchemaOutput.render(
+                    command: "pin",
+                    pretty: parsed.pretty,
+                    fields: parsed.fields
+                )
+                print(output)
+                return
+            }
+
+            guard let coordinate = parsed.coordinate else {
+                throw CLIError.user("Provide coordinate values or use --json-schema.")
+            }
+
             let url = try MapsURLBuilder.pin(
-                coordinate: parsed.coordinate,
+                coordinate: coordinate,
                 label: parsed.label
             )
             let opened = await MainActor.run { NSWorkspace.shared.open(url) }
@@ -77,11 +95,13 @@ struct PinCommand: AsyncParsableCommand {
         tokens: [String],
         defaultLabel: String?,
         defaultPretty: Bool,
-        defaultFields: String?
-    ) throws -> (coordinate: Coordinate, label: String?, pretty: Bool, fields: String?) {
+        defaultFields: String?,
+        defaultJSONSchema: Bool
+    ) throws -> (coordinate: Coordinate?, label: String?, pretty: Bool, fields: String?, jsonSchema: Bool) {
         var resolvedLabel = defaultLabel
         var resolvedPretty = defaultPretty
         var resolvedFields = defaultFields
+        var resolvedJSONSchema = defaultJSONSchema
         var coordinateTokens: [String] = []
 
         var index = 0
@@ -104,10 +124,17 @@ struct PinCommand: AsyncParsableCommand {
                 }
                 resolvedFields = tokens[index + 1]
                 index += 2
+            case "--json-schema":
+                resolvedJSONSchema = true
+                index += 1
             default:
                 coordinateTokens.append(token)
                 index += 1
             }
+        }
+
+        if resolvedJSONSchema, coordinateTokens.isEmpty {
+            return (nil, resolvedLabel, resolvedPretty, resolvedFields, true)
         }
 
         guard coordinateTokens.count == 2 else {
@@ -130,6 +157,6 @@ struct PinCommand: AsyncParsableCommand {
             throw CLIError.user("Longitude must be between -180 and 180.")
         }
 
-        return (Coordinate(lat: lat, lon: lon), resolvedLabel, resolvedPretty, resolvedFields)
+        return (Coordinate(lat: lat, lon: lon), resolvedLabel, resolvedPretty, resolvedFields, resolvedJSONSchema)
     }
 }

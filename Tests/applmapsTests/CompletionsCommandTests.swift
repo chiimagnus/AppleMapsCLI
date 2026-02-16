@@ -22,6 +22,13 @@ struct CompletionsCommandParsingTests {
         #expect(parsed.shell == "fish")
     }
 
+    @Test("Parses schema flag without shell argument")
+    func parseSchemaFlag() throws {
+        let parsed = try CompletionsCommand.parse(["--json-schema"])
+        #expect(parsed.shell == nil)
+        #expect(parsed.jsonSchema)
+    }
+
     @Test("Rejects unsupported shell names at runtime validation")
     func rejectsUnsupportedShell() {
         #expect(throws: CLIError.user("Shell must be one of: zsh, bash, fish.")) {

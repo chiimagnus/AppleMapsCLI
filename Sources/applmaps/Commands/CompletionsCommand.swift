@@ -8,10 +8,27 @@ struct CompletionsCommand: ParsableCommand {
     )
 
     @Argument(help: "Shell type: zsh, bash, fish")
-    var shell: String
+    var shell: String?
+
+    @Flag(name: .long, help: "Print command input/output JSON schema and exit")
+    var jsonSchema: Bool = false
 
     mutating func run() throws {
         do {
+            if jsonSchema {
+                let output = try CommandSchemaOutput.render(
+                    command: "completions",
+                    pretty: false,
+                    fields: nil
+                )
+                print(output)
+                return
+            }
+
+            guard let shell else {
+                throw CLIError.user("Provide a shell argument or use --json-schema.")
+            }
+
             let parsedShell = try Self.parseShell(rawValue: shell)
             let script = try Self.generateScript(shell: parsedShell)
             if script.hasSuffix("\n") {

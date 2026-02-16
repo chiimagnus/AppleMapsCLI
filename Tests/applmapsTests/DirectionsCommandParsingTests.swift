@@ -32,4 +32,13 @@ struct DirectionsCommandParsingTests {
         #expect(parsed.mode == "driving")
         #expect(!parsed.alternatives)
     }
+
+    @Test("Allows schema flag without required endpoints")
+    func schemaWithoutEndpoints() throws {
+        let parsed = try DirectionsCommand.parse(["--json-schema"])
+
+        #expect(parsed.from == nil)
+        #expect(parsed.to == nil)
+        #expect(parsed.jsonSchema)
+    }
 }

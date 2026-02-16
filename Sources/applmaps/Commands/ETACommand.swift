@@ -8,7 +8,7 @@ struct ETACommand: AsyncParsableCommand {
     )
 
     @Option(name: .long, help: "Origin location query or coordinate in 'lat,lon' format")
-    var from: String
+    var from: String?
 
     @Option(name: .long, help: "Destination query (repeat --to for multiple destinations)")
     var to: [String] = []
@@ -22,10 +22,27 @@ struct ETACommand: AsyncParsableCommand {
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
+    @Flag(name: .long, help: "Print command input/output JSON schema and exit")
+    var jsonSchema: Bool = false
+
     mutating func run() async throws {
         let runner = ETARunner(etaService: MapKitETAService())
 
         do {
+            if jsonSchema {
+                let output = try CommandSchemaOutput.render(
+                    command: "eta",
+                    pretty: pretty,
+                    fields: fields
+                )
+                print(output)
+                return
+            }
+
+            guard let from, !from.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw CLIError.user("ETA requires --from unless using --json-schema.")
+            }
+
             let parsedMode = try parseMode(mode)
             let response = try await runner.execute(
                 from: from,

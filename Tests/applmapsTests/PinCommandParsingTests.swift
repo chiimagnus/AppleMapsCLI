@@ -36,12 +36,14 @@ struct PinCommandParsingTests {
             tokens: ["37.78", "-122.41", "--label", "Office", "--pretty"],
             defaultLabel: nil,
             defaultPretty: false,
-            defaultFields: nil
+            defaultFields: nil,
+            defaultJSONSchema: false
         )
 
         #expect(resolved.coordinate == Coordinate(lat: 37.78, lon: -122.41))
         #expect(resolved.label == "Office")
         #expect(resolved.pretty)
+        #expect(!resolved.jsonSchema)
     }
 
     @Test("Supports negative coordinates")
@@ -50,7 +52,8 @@ struct PinCommandParsingTests {
             tokens: ["-37.78", "-122.41"],
             defaultLabel: nil,
             defaultPretty: false,
-            defaultFields: nil
+            defaultFields: nil,
+            defaultJSONSchema: false
         )
 
         #expect(resolved.coordinate == Coordinate(lat: -37.78, lon: -122.41))
@@ -62,9 +65,25 @@ struct PinCommandParsingTests {
             tokens: ["37.78", "-122.41", "--fields", "url,opened"],
             defaultLabel: nil,
             defaultPretty: false,
-            defaultFields: nil
+            defaultFields: nil,
+            defaultJSONSchema: false
         )
 
         #expect(resolved.fields == "url,opened")
+    }
+
+    @Test("Supports schema-only mode without coordinates")
+    func schemaOnlyMode() throws {
+        let parsed = try PinCommand.parse(["--json-schema"])
+        let resolved = try PinCommand.parseInputs(
+            tokens: parsed.coordinates,
+            defaultLabel: parsed.label,
+            defaultPretty: parsed.pretty,
+            defaultFields: parsed.fields,
+            defaultJSONSchema: parsed.jsonSchema
+        )
+
+        #expect(resolved.coordinate == nil)
+        #expect(resolved.jsonSchema)
     }
 }

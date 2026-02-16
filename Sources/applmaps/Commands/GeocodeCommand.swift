@@ -19,12 +19,25 @@ struct GeocodeCommand: AsyncParsableCommand {
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
+    @Flag(name: .long, help: "Print command input/output JSON schema and exit")
+    var jsonSchema: Bool = false
+
     mutating func run() async throws {
         let geocodingService = CLGeocodingService()
         let runner = GeocodeRunner(geocodingService: geocodingService)
         let batchRunner = BatchGeocodeRunner(geocodingService: geocodingService)
 
         do {
+            if jsonSchema {
+                let output = try CommandSchemaOutput.render(
+                    command: "geocode",
+                    pretty: pretty,
+                    fields: fields
+                )
+                print(output)
+                return
+            }
+
             let response: any Encodable
 
             if stdin {

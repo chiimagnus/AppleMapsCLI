@@ -35,4 +35,12 @@ struct GeocodeCommandParsingTests {
         #expect(parsed.stdin)
         #expect(parsed.address == "1 Apple Park Way")
     }
+
+    @Test("Parses schema flag without address")
+    func parseSchemaFlag() throws {
+        let parsed = try GeocodeCommand.parse(["--json-schema"])
+
+        #expect(parsed.jsonSchema)
+        #expect(parsed.address == nil)
+    }
 }

@@ -8,7 +8,7 @@ struct SearchCommand: AsyncParsableCommand {
     )
 
     @Argument(help: "Natural-language search query")
-    var query: String
+    var query: String?
 
     @Option(name: .long, help: "Bias results around a coordinate in 'lat,lon' format")
     var near: String?
@@ -25,10 +25,27 @@ struct SearchCommand: AsyncParsableCommand {
     @Flag(name: .long, help: "Force pretty-printed JSON output")
     var pretty: Bool = false
 
+    @Flag(name: .long, help: "Print command input/output JSON schema and exit")
+    var jsonSchema: Bool = false
+
     mutating func run() async throws {
         let runner = SearchRunner(searchService: MapKitSearchService())
 
         do {
+            if jsonSchema {
+                let output = try CommandSchemaOutput.render(
+                    command: "search",
+                    pretty: pretty,
+                    fields: fields
+                )
+                print(output)
+                return
+            }
+
+            guard let query else {
+                throw CLIError.user("Provide a search query argument or use --json-schema.")
+            }
+
             let nearCoordinate: Coordinate?
             if let near {
                 guard let parsed = Coordinate(string: near) else {

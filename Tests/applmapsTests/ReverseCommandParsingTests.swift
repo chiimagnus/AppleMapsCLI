@@ -60,10 +60,26 @@ struct ReverseCommandParsingTests {
         let resolved = try ReverseCommand.parseInputs(
             tokens: parsed.coordinates,
             defaultPretty: parsed.pretty,
-            defaultFields: parsed.fields
+            defaultFields: parsed.fields,
+            defaultJSONSchema: parsed.jsonSchema
         )
 
         #expect(resolved.coordinate == Coordinate(lat: 37.3349, lon: -122.0090))
         #expect(resolved.fields == "coordinate")
+        #expect(!resolved.jsonSchema)
+    }
+
+    @Test("Parses schema flag with no coordinates")
+    func parseSchemaFlag() throws {
+        let parsed = try ReverseCommand.parse(["--json-schema"])
+        let resolved = try ReverseCommand.parseInputs(
+            tokens: parsed.coordinates,
+            defaultPretty: parsed.pretty,
+            defaultFields: parsed.fields,
+            defaultJSONSchema: parsed.jsonSchema
+        )
+
+        #expect(resolved.coordinate == nil)
+        #expect(resolved.jsonSchema)
     }
 }
