@@ -232,6 +232,34 @@ struct ETAResponse: Sendable, Codable, Equatable {
     let results: [ETAResult]
 }
 
+struct RouteStep: Sendable, Codable, Equatable {
+    let instruction: String
+    let distanceM: Double
+    let distanceText: String
+}
+
+struct Route: Sendable, Codable, Equatable {
+    let name: String
+    let distanceM: Double
+    let distanceText: String
+    let durationS: Double
+    let durationText: String
+    let advisoryNotices: [String]
+    let steps: [RouteStep]
+}
+
+struct RouteEndpoint: Sendable, Codable, Equatable {
+    let name: String
+    let coordinate: Coordinate
+}
+
+struct DirectionsResponse: Sendable, Codable, Equatable {
+    let origin: RouteEndpoint
+    let destination: RouteEndpoint
+    let transportType: String
+    let routes: [Route]
+}
+
 private extension String {
     var nilIfEmpty: String? {
         let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
