@@ -185,3 +185,22 @@ Date: 2026-02-16T06:42:14Z
   - `.build/debug/applmaps eta --help` shows expected usage and flags.
   - `.build/debug/applmaps eta --from "SF" --mode driving` exits `1` with destination validation.
   - `.build/debug/applmaps eta --from "SF" --to "Oakland" --to "SJC"` executes and maps live `MKErrorDomain error 1` to exit `2` in this environment.
+
+## Iteration 5 — S05-directions-command — Directions command
+Date: 2026-02-16T06:55:58Z
+- Implemented `directions` command with required `--from` and `--to`, plus `--mode`, `--alternatives`, and `--pretty` flags.
+- Added directions domain models (`RouteStep`, `Route`, `RouteEndpoint`, `DirectionsResponse`) and a `DirectionsRunner` with semantic CLI error mapping.
+- Added `DirectionsService` contract and `MapKitDirectionsService` actor using `MKLocalSearch` location resolution and `MKDirections.calculate()`.
+- Mapped route payloads to JSON-first schema with numeric/text distance and duration, advisory notices, and turn-by-turn steps.
+- Added deterministic tests for runner behavior and command parsing:
+  - `DirectionsRunnerTests`
+  - `DirectionsCommandParsingTests`
+- Wired `DirectionsCommand` into the root command tree (`applmaps directions`).
+- Verified with:
+  - `swift build --disable-sandbox`
+  - `swift build -c release --disable-sandbox`
+  - `swift test --disable-sandbox --verbose`
+- Manual smoke checks:
+  - `.build/debug/applmaps directions --help` shows expected usage and flags.
+  - `.build/debug/applmaps directions --from "Cupertino" --to "SF" --mode teleport` exits `1` with mode validation.
+  - `.build/debug/applmaps directions --from "Cupertino" --to "SF" --mode driving` executes and maps live `MKErrorDomain error 1` to exit `2` in this environment.

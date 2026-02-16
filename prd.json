@@ -80,7 +80,7 @@
       "acceptance": [
         "applmaps directions --from \"Cupertino\" --to \"SF\" --mode driving"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S06",
