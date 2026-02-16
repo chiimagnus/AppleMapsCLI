@@ -9,6 +9,7 @@ struct ApplMaps: AsyncParsableCommand {
             GeocodeCommand.self,
             ReverseCommand.self,
             SearchCommand.self,
+            DirectionsCommand.self,
             ETACommand.self
         ]
     )
