@@ -230,6 +230,16 @@ struct SearchCompletionResponse: Sendable, Codable, Equatable {
     let results: [SearchCompletion]
 }
 
+struct POICategory: Sendable, Codable, Equatable {
+    let id: String
+    let mapkitValue: String
+}
+
+struct CategoriesResponse: Sendable, Codable, Equatable {
+    let count: Int
+    let results: [POICategory]
+}
+
 enum TransportMode: String, Sendable, Codable, Equatable, CaseIterable {
     case driving
     case walking
