@@ -142,3 +142,16 @@ Date: 2026-02-16T05:39:24Z
 - Verified with `swift build --disable-sandbox`, `swift build -c release --disable-sandbox`, and `swift test --disable-sandbox --verbose`.
 - Manual smoke check passed: `.build/debug/applmaps geocode "Apple Park"` returned JSON payload with exit `0`.
 - Discovered patterns were documented in `AGENTS.md §13` (explicit ArgumentParser `commandName` and `@main` entrypoint filename guidance).
+
+## Iteration 2 — S02-reverse-geocode-command — Reverse geocode command
+Date: 2026-02-16T06:17:44Z
+- Implemented `reverse` command for coordinate-to-address conversion with JSON-first output.
+- Extended the geocoding service contract with reverse geocoding and added `ReverseGeocodeRunner` for validation and semantic error mapping.
+- Added `ReverseCommand` wiring in root CLI and ensured semantic exits for user (`1`), network (`2`), and no-results (`3`) paths.
+- Fixed positional negative-coordinate parsing by capturing passthrough positional input and parsing coordinates explicitly.
+- Added deterministic Swift Testing coverage for reverse runner logic and reverse command coordinate parsing behavior.
+- Verified with `swift build --disable-sandbox`, `swift build -c release --disable-sandbox`, and `swift test --disable-sandbox --verbose`.
+- Manual smoke checks passed:
+  - `.build/debug/applmaps reverse 37.3349 -122.0090` -> JSON payload, exit `0`
+  - `.build/debug/applmaps reverse 100 0` -> validation message, exit `1`
+- Added S02 discovery to `AGENTS.md §13` for signed-coordinate parsing with ArgumentParser.

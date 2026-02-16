@@ -35,7 +35,7 @@
       "acceptance": [
         "applmaps reverse 37.33 -122.01 returns address"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "S03",
