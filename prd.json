@@ -128,21 +128,6 @@
     },
     {
       "id": "S09",
-      "title": "MCP server mode",
-      "phase": 3,
-      "priority": "P1",
-      "description": "As an AI agent, I want structured tool schemas so I can discover capabilities.",
-      "requirements": [
-        "Implement applmaps mcp mode",
-        "Expose commands as typed MCP tools"
-      ],
-      "acceptance": [
-        "Claude Desktop can call applmaps tools via MCP"
-      ],
-      "passes": false
-    },
-    {
-      "id": "S10",
       "title": "Fields projection",
       "phase": 3,
       "priority": "P0",
@@ -157,7 +142,7 @@
       "passes": false
     },
     {
-      "id": "S11",
+      "id": "S10",
       "title": "Shell completions",
       "phase": 3,
       "priority": "P1",
@@ -171,7 +156,7 @@
       "passes": false
     },
     {
-      "id": "S12",
+      "id": "S11",
       "title": "JSON schema export",
       "phase": 3,
       "priority": "P1",
@@ -186,7 +171,7 @@
       "passes": false
     },
     {
-      "id": "S13",
+      "id": "S12",
       "title": "Search autocomplete",
       "phase": 4,
       "priority": "P2",
@@ -200,7 +185,7 @@
       "passes": false
     },
     {
-      "id": "S14",
+      "id": "S13",
       "title": "Categories command",
       "phase": 4,
       "priority": "P2",
@@ -210,21 +195,6 @@
       ],
       "acceptance": [
         "applmaps categories --format table"
-      ],
-      "passes": false
-    },
-    {
-      "id": "S15",
-      "title": "Server backend option",
-      "phase": 4,
-      "priority": "P2",
-      "description": "As an enterprise user, I want to use the REST API backend for higher quotas.",
-      "requirements": [
-        "Implement backend server option",
-        "Support Apple Maps Server API with API key config"
-      ],
-      "acceptance": [
-        "applmaps search \"coffee\" --backend server"
       ],
       "passes": false
     }
