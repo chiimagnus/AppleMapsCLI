@@ -346,3 +346,32 @@ Date: 2026-02-16T08:00:25Z
 - Manual smoke checks:
   - `.build/debug/applmaps complete --json-schema` emits schema and exits `0`.
   - `.build/debug/applmaps complete "star"` maps current environment MapKit failure to semantic network exit `2` (MKErrorDomain error 1).
+
+## Iteration 13 — S13-categories-command — Categories command
+Date: 2026-02-16T08:07:06Z
+- Implemented `categories` command returning MapKit POI categories with deterministic output.
+- Added core categories stack:
+  - `CategoriesService` + `MapKitCategoriesService`
+  - `CategoriesRunner` with dedupe/sort and semantic no-results mapping
+- Added categories models:
+  - `POICategory` (`id`, `mapkit_value`)
+  - `CategoriesResponse`
+- Added output support:
+  - `CategoriesOutputFormatter` for `--format text` and `--format table`
+  - `--format json|text|table` parsing/validation in command
+- Added schema support:
+  - `categories` input/output schema in `CommandSchemaRegistry`
+  - `categories --json-schema` support in command
+- Wired `CategoriesCommand` into root command tree.
+- Added deterministic tests:
+  - `CategoriesRunnerTests`
+  - `CategoriesCommandParsingTests`
+  - `CategoriesOutputFormatterTests`
+  - updated `CommandSchemaRegistryTests` with categories schema assertions
+- Verified with:
+  - `swift build --disable-sandbox`
+  - `swift build -c release --disable-sandbox`
+  - `swift test --disable-sandbox --verbose`
+- Manual smoke checks:
+  - `.build/debug/applmaps categories --format table` returns tabular category list and exits `0`.
+  - `.build/debug/applmaps categories --json-schema` emits schema and exits `0`.

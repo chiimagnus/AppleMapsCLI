@@ -600,6 +600,12 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Discovery:** Wrapping autocomplete behavior in a dedicated async core service keeps command code small, avoids callback/delegate complexity, and makes semantic exit mapping deterministic in tests.
 **Pattern:** Implement `SearchCompletionService` + `SearchCompletionRunner`, use `MKLocalSearch` with `.pointOfInterest` for suggestion candidates, dedupe by normalized `title|subtitle`, and map MapKit failures into `CLIError.network` / `CLIError.noResults` in the runner.
 
+### POI Category Catalog — Maintain explicit category mapping
+**Discovered in:** Iteration 13, Story S13
+**Context:** Implementing `applmaps categories` from `MKPointOfInterestCategory`.
+**Discovery:** MapKit does not expose a direct `allCategories` enumeration API suitable for deterministic CLI output.
+**Pattern:** Maintain an explicit ordered mapping of `(id, MKPointOfInterestCategory)` values, emit both CLI-friendly `id` and `mapkit_value`, and normalize output in a runner (dedupe + sort) before formatting to JSON/text/table.
+
 ### MapKit ETA Response Type — Use Swift name `MKDirections.ETAResponse`
 **Discovered in:** Iteration 4, Story S04
 **Context:** Implementing the `eta` command service with `MKDirections.calculateETA()`.

@@ -196,7 +196,7 @@
       "acceptance": [
         "applmaps categories --format table"
       ],
-      "passes": false
+      "passes": true
     }
   ]
 }
