@@ -3,6 +3,7 @@ import Foundation
 
 struct GeocodeCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
+        commandName: "geocode",
         abstract: "Convert an address into geographic coordinates."
     )
 
