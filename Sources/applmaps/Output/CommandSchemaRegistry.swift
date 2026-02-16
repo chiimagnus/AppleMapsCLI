@@ -127,6 +127,8 @@ enum CommandSchemaRegistry {
             return document(command: "open", input: openInput, output: openOutput)
         case "pin":
             return document(command: "pin", input: pinInput, output: pinOutput)
+        case "categories":
+            return document(command: "categories", input: categoriesInput, output: categoriesOutput)
         case "completions":
             return document(command: "completions", input: completionsInput, output: completionsOutput)
         default:
@@ -230,6 +232,14 @@ enum CommandSchemaRegistry {
             "display": .string()
         ],
         required: ["title", "subtitle", "display"]
+    )
+
+    private static let poiCategory = JSONSchemaNode.object(
+        properties: [
+            "id": .string(),
+            "mapkit_value": .string()
+        ],
+        required: ["id", "mapkit_value"]
     )
 
     private static let routeStep = JSONSchemaNode.object(
@@ -452,6 +462,27 @@ enum CommandSchemaRegistry {
     )
 
     private static let pinOutput = openResponse
+
+    private static let categoriesInput = JSONSchemaNode.object(
+        properties: [
+            "format": .string(
+                description: "Output format.",
+                enumValues: ["json", "text", "table"]
+            ),
+            "fields": .string(description: "Comma-separated JSON fields projection."),
+            "pretty": .boolean(description: "Pretty-print JSON output."),
+            "json_schema": .boolean(description: "Return this command schema instead of executing.")
+        ],
+        description: "Input options for categories."
+    )
+
+    private static let categoriesOutput = JSONSchemaNode.object(
+        properties: [
+            "count": .integer(),
+            "results": .array(poiCategory)
+        ],
+        required: ["count", "results"]
+    )
 
     private static let completionsInput = JSONSchemaNode.object(
         properties: [

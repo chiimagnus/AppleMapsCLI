@@ -12,6 +12,7 @@ struct CommandSchemaRegistryTests {
         "eta",
         "open",
         "pin",
+        "categories",
         "completions"
     ])
     func schemaExists(command: String) {
@@ -53,5 +54,14 @@ struct CommandSchemaRegistryTests {
         #expect(resultsItems?.properties?["title"]?.type == "string")
         #expect(resultsItems?.properties?["subtitle"]?.type == "string")
         #expect(resultsItems?.properties?["display"]?.type == "string")
+    }
+
+    @Test("Categories schema output includes id and mapkit value")
+    func categoriesSchemaShape() {
+        let schema = CommandSchemaRegistry.schema(for: "categories")
+        let resultsItems = schema?.output.properties?["results"]?.items
+
+        #expect(resultsItems?.properties?["id"]?.type == "string")
+        #expect(resultsItems?.properties?["mapkit_value"]?.type == "string")
     }
 }
