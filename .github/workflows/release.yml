@@ -1,0 +1,140 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  queue: max
+
+jobs:
+  package:
+    name: Build universal macOS archive
+    runs-on: macos-26
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate tag, main ancestry, CI and release state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF_NAME" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || {
+            echo "Expected a stable semantic version tag (vMAJOR.MINOR.PATCH)." >&2
+            exit 1
+          }
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git fetch --no-tags origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
+            echo "Release tag must belong to main." >&2
+            exit 1
+          }
+
+          ci_state="$(gh run list --workflow ci.yml --event push --commit "$GITHUB_SHA" --limit 10 --json status,conclusion --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end')"
+          test "$ci_state" = "completed:success" || {
+            echo "Successful push CI on this exact SHA is required; got $ci_state." >&2
+            exit 1
+          }
+
+          existing="$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[].tag_name')"
+          if printf '%s\n' "$existing" | grep -Fxq "$GITHUB_REF_NAME"; then
+            echo "GitHub Release already exists: $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+
+      - name: Re-test tagged source
+        run: swift test --disable-automatic-resolution
+
+      - name: Build and inspect universal release
+        shell: bash
+        run: |
+          set -euo pipefail
+          swift build -c release --disable-automatic-resolution --arch arm64 --arch x86_64
+          binary=".build/release/applemaps"
+          for arch in arm64 x86_64; do
+            lipo "$binary" -verify_arch "$arch"
+            vtool -show-build -arch "$arch" "$binary" | grep -Eq 'minos[[:space:]]+13\.0'
+          done
+          "$binary" --help | grep -q 'USAGE: applemaps'
+          "$binary" directions --json-schema | python3 -c 'import json,sys; assert "via" in json.load(sys.stdin)["input"]["properties"]'
+          mkdir -p dist
+          COPYFILE_DISABLE=1 tar -czf dist/applemaps-macos-universal.tar.gz -C .build/release applemaps
+          test "$(tar -tzf dist/applemaps-macos-universal.tar.gz)" = "applemaps"
+
+      - name: Upload archive for verification
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-package
+          path: dist/applemaps-macos-universal.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  verify-intel:
+    name: Run packaged binary on Intel macOS
+    needs: package
+    runs-on: macos-15-intel
+    timeout-minutes: 10
+    steps:
+      - name: Download release package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-package
+          path: dist
+
+      - name: Verify x86_64 archive execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = x86_64
+          mkdir -p "$RUNNER_TEMP/verify"
+          tar -xzf dist/applemaps-macos-universal.tar.gz -C "$RUNNER_TEMP/verify"
+          for arch in arm64 x86_64; do
+            lipo "$RUNNER_TEMP/verify/applemaps" -verify_arch "$arch"
+          done
+          "$RUNNER_TEMP/verify/applemaps" --help | grep -q 'USAGE: applemaps'
+          "$RUNNER_TEMP/verify/applemaps" directions --json-schema | python3 -c 'import json,sys; assert "via" in json.load(sys.stdin)["input"]["properties"]'
+
+  publish:
+    name: Publish GitHub Release
+    needs: [package, verify-intel]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download verified archive
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-package
+          path: dist
+
+      - name: Attest release archive
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: dist/applemaps-macos-universal.tar.gz
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "$GITHUB_REF_NAME" dist/applemaps-macos-universal.tar.gz \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes \
+            --title "$GITHUB_REF_NAME" --latest

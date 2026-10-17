@@ -1,0 +1,45 @@
+name: Bug report
+description: Report reproducible AppleMapsCLI behavior that is not working as expected
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "中文优先，英文也可以。请勿公开个人位置、住址或精确路线。"
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Expected and actual behavior
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run applemaps ...
+        2. Observe ...
+      description: Replace addresses or coordinates with non-sensitive examples.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v0.1.0 or short SHA
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Environment
+      placeholder: macOS version, Apple Silicon/Intel, Homebrew/source, relevant MapKit mode
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs or screenshots (optional)
+      description: Redact location history, precise coordinates, addresses, tokens and personal data before uploading.
+    validations:
+      required: false

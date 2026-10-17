@@ -17,7 +17,16 @@ Forked from [rastreus/applmaps](https://github.com/rastreus/applmaps) under the 
 ## Requirements
 
 - macOS 13 or later (`open --via` requires macOS 15.4+)
-- Xcode with Swift 6 toolchain
+- Xcode with Swift 6 toolchain **only when building from source**
+
+## Install
+
+```bash
+brew install chiimagnus/tap/applemapscli
+applemaps --help
+```
+
+GitHub Releases distribute one universal binary for Apple Silicon and Intel. See [release and Homebrew details](docs/release.md).
 
 ## Build
 
@@ -156,7 +165,7 @@ Where supported (`directions`, `eta`, `open`):
 - `transit`
 - `cycling`
 
-## Install (optional)
+## Install from source (optional)
 
 ```bash
 swift build -c release
@@ -174,3 +183,4 @@ install -m 755 .build/release/applemaps ~/.local/bin/applemaps
 - Tests use Swift Testing (`import Testing`).
 - See `AGENTS.md` for architecture and project constraints.
 - See `docs/SKILL.md` for OpenClaw AgentSkill guidance.
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for Issue, PR and testing guidelines.

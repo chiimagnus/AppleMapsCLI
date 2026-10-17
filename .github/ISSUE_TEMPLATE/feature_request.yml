@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest a focused AppleMapsCLI improvement
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: "中文优先，英文也可以。Chinese preferred; English is welcome."
+  - type: textarea
+    id: what
+    attributes:
+      label: What should AppleMapsCLI do?
+      description: Describe the desired user-visible behavior and important failure cases.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it useful here?
+      description: Explain the workflow or problem this would improve.
+    validations:
+      required: true
