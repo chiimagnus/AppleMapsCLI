@@ -88,7 +88,7 @@ pitfalls that your training data may not reflect.
    ```bash
    jj log --limit 10                  # Recent commits
    jj st                              # Working copy status
-   ls Sources/ApplMaps/               # Current structure
+   ls Sources/AppleMapsCLI/               # Current structure
    tree Sources/ Tests/ -L 2          # Overview of modules
    ```
 
@@ -175,8 +175,8 @@ swift build -c release
 swift test --verbose
 
 # Manual smoke test if command is user-facing
-.build/debug/applmaps geocode "Apple Park" --format json
-.build/debug/applmaps search "coffee" --format text
+.build/debug/applemaps geocode "Apple Park" --format json
+.build/debug/applemaps search "coffee" --format text
 ```
 
 **ALL must pass.** If any fails, fix it before completing the story.
@@ -303,7 +303,7 @@ swift test && jj new || jj restore
 swift build -c release && swift test --verbose
 
 # Manual test if command is user-facing
-.build/debug/applmaps <command> <args>
+.build/debug/applemaps <command> <args>
 
 # === CRITICAL: Check for discoveries ===
 # Did you discover anything? Update AGENTS.md §13 or docs/solutions/
@@ -320,12 +320,12 @@ jj new
 
 ---
 
-## Swift 6 Quick Reference (applmaps-specific)
+## Swift 6 Quick Reference (applemaps-specific)
 
 ### Testing Patterns
 ```swift
 import Testing
-@testable import ApplMaps
+@testable import AppleMapsCLI
 
 @Suite("Coordinate Parsing Tests")
 struct CoordinateTests {
@@ -460,7 +460,7 @@ Common causes:
 
 ### Command Works But Output Wrong
 ```bash
-.build/debug/applmaps <cmd> --verbose 2>&1 | less
+.build/debug/applemaps <cmd> --verbose 2>&1 | less
 ```
 Check:
 - JSON schema matches spec

@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import applmaps
+@testable import AppleMapsCLI
 
 @Suite("Maps URL Builder Tests")
 struct MapsURLBuilderTests {

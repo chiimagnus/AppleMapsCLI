@@ -1,15 +1,16 @@
 ---
-name: applmaps
+name: applemaps
 type: AgentSkill
 compatible_with: OpenClaw
-entrypoint: applmaps
+entrypoint: applemaps
+description: Search places, plan multistop journeys and open Apple Maps using the local `applemaps` CLI on macOS.
 version: 1.0.0
 platform: macOS
 ---
 
-# applmaps AgentSkill for OpenClaw
+# AppleMapsCLI AgentSkill for OpenClaw
 
-This skill enables OpenClaw agents to use the `applmaps` CLI for Apple Maps search, geocoding, routing, URL opening, and category discovery.
+This skill enables OpenClaw agents to use the `applemaps` CLI for Apple Maps search, geocoding, routing, URL opening, and category discovery.
 
 ## Scope
 
@@ -22,16 +23,16 @@ This skill enables OpenClaw agents to use the `applmaps` CLI for Apple Maps sear
 
 | Intent | Command |
 | --- | --- |
-| Forward geocode an address | `applmaps geocode "<address>"` |
-| Reverse geocode coordinates | `applmaps reverse <lat> <lon>` |
-| Search for places | `applmaps search "<query>"` |
-| Autocomplete query text | `applmaps complete "<partial>"` |
-| Get route directions | `applmaps directions --from "<origin>" --to "<destination>"` |
-| Get ETA for one or more destinations | `applmaps eta --from "<origin>" --to "<destination>" [--to "..."]` |
-| Open Apple Maps URL modes | `applmaps open ...` |
-| Drop a pin in Maps | `applmaps pin <lat> <lon> [--label "..."]` |
-| List POI categories | `applmaps categories [--format json|text|table]` |
-| Generate shell completions | `applmaps completions zsh|bash|fish` |
+| Forward geocode an address | `applemaps geocode "<address>"` |
+| Reverse geocode coordinates | `applemaps reverse <lat> <lon>` |
+| Search for places | `applemaps search "<query>"` |
+| Autocomplete query text | `applemaps complete "<partial>"` |
+| Get route directions (optional multiple stops) | `applemaps directions --from "<origin>" --via "<stop>" --to "<destination>"` |
+| Get ETA for one or more destinations | `applemaps eta --from "<origin>" --to "<destination>" [--to "..."]` |
+| Open Apple Maps URL modes | `applemaps open ...` |
+| Drop a pin in Maps | `applemaps pin <lat> <lon> [--label "..."]` |
+| List POI categories | `applemaps categories [--format json|text|table]` |
+| Generate shell completions | `applemaps completions zsh|bash|fish` |
 
 ## Output and Exit Contract
 
@@ -63,28 +64,29 @@ Semantic exit codes:
 ### Geocode and reverse geocode
 
 ```bash
-applmaps geocode "1 Apple Park Way, Cupertino, CA"
-applmaps reverse 37.3349 -122.0090
+applemaps geocode "1 Apple Park Way, Cupertino, CA"
+applemaps reverse 37.3349 -122.0090
 ```
 
 ### Batch geocode from stdin
 
 ```bash
-printf "New York, NY\nSeattle, WA\n" | applmaps geocode --stdin
+printf "New York, NY\nSeattle, WA\n" | applemaps geocode --stdin
 ```
 
 ### Search and autocomplete
 
 ```bash
-applmaps search "coffee" --near "37.7749,-122.4194" --radius 1500 --limit 5
-applmaps complete "star" --limit 10
+applemaps search "coffee" --near "37.7749,-122.4194" --radius 1500 --limit 5
+applemaps complete "star" --limit 10
 ```
 
 ### Directions and ETA
 
 ```bash
-applmaps directions --from "San Francisco, CA" --to "San Jose, CA" --mode driving
-applmaps eta --from "San Francisco, CA" --to "Oakland, CA" --to "Berkeley, CA"
+applemaps directions --from "San Francisco, CA" --to "San Jose, CA" --mode driving
+applemaps directions --from "北京" --via "洛阳" --via "芜湖" --via "杭州" --to "上海" --mode driving
+applemaps eta --from "San Francisco, CA" --to "Oakland, CA" --to "Berkeley, CA"
 ```
 
 Supported transport modes:
@@ -97,17 +99,18 @@ Supported transport modes:
 ### Open and pin
 
 ```bash
-applmaps open --search "coffee near Union Square"
-applmaps open --location "37.3349,-122.0090" --zoom 15
-applmaps open --from "San Francisco, CA" --to "San Jose, CA" --mode transit
-applmaps pin 37.3349 -122.0090 --label "Apple Park"
+applemaps open --search "coffee near Union Square"
+applemaps open --location "37.3349,-122.0090" --zoom 15
+applemaps open --from "San Francisco, CA" --to "San Jose, CA" --mode transit
+applemaps open --from "北京" --via "洛阳" --via "芜湖" --via "杭州" --to "上海" --mode driving
+applemaps pin 37.3349 -122.0090 --label "Apple Park"
 ```
 
 ### Categories and completions
 
 ```bash
-applmaps categories --format table
-applmaps completions zsh
+applemaps categories --format table
+applemaps completions zsh
 ```
 
 ## Integration Notes for OpenClaw
@@ -115,7 +118,7 @@ applmaps completions zsh
 - Parse stdout as JSON by default.
 - Read stderr for actionable diagnostics.
 - For reverse and pin, prefer separate numeric latitude/longitude tokens:
-  - `applmaps reverse 37.3349 -122.0090`
-  - `applmaps pin 37.3349 -122.0090`
+  - `applemaps reverse 37.3349 -122.0090`
+  - `applemaps pin 37.3349 -122.0090`
 - For schema-driven agents, start with:
-  - `applmaps <command> --json-schema`
+  - `applemaps <command> --json-schema`

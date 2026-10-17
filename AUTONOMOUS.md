@@ -7,7 +7,7 @@
 Give your AI agent this single prompt to start autonomous development:
 
 ```
-You are an autonomous software development agent working on applmaps.
+You are an autonomous software development agent working on applemaps.
 
 Read these files in order:
 1. AGENTS.md — Project rules and architecture
@@ -81,7 +81,7 @@ git init
 jj init --git-repo=.
 
 # 2. Create initial structure
-mkdir -p Sources/ApplMaps Tests/ApplMapsTests .agents/skills/swift6 docs/solutions
+mkdir -p Sources/AppleMapsCLI Tests/AppleMapsCLITests .agents/skills/swift6 docs/solutions
 
 # 3. Add project files
 # - Copy AGENTS.md, PROMPT.md, prd.json to root

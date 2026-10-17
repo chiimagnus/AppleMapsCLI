@@ -1,5 +1,5 @@
 import Testing
-@testable import applmaps
+@testable import AppleMapsCLI
 
 @Suite("Geocode Runner Tests")
 struct GeocodeRunnerTests {

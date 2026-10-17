@@ -1,8 +1,8 @@
-# `applmaps`: an agent-first Apple Maps CLI tool
+# AppleMapsCLI: an agent-first Apple Maps CLI tool
 
-**`applmaps` is a native Swift command-line tool that gives AI agents and developers programmatic access to Apple Maps — search, directions, geocoding, and map control — without ever opening Xcode or touching a GUI.** It wraps MapKit's non-UI APIs (MKLocalSearch, MKDirections, CLGeocoder) alongside the `maps://` URL scheme to provide both structured data retrieval and visual map control from the terminal. Designed for the agent-first workflow described in Peter Steinberger's "Shipping at Inference Speed" philosophy, every command outputs machine-readable JSON by default, uses semantic exit codes, and avoids interactive prompts — making it instantly consumable by LLM coding agents, shell scripts, and MCP tool servers alike.
+**`applemaps` is a native Swift command-line tool that gives AI agents and developers programmatic access to Apple Maps — search, directions, geocoding, and map control — without ever opening Xcode or touching a GUI.** It wraps MapKit's non-UI APIs (MKLocalSearch, MKDirections, CLGeocoder) alongside the `maps://` URL scheme to provide both structured data retrieval and visual map control from the terminal. Designed for the agent-first workflow described in Peter Steinberger's "Shipping at Inference Speed" philosophy, every command outputs machine-readable JSON by default, uses semantic exit codes, and avoids interactive prompts — making it instantly consumable by LLM coding agents, shell scripts, and MCP tool servers alike.
 
-This document specifies the full architecture, API surface, data models, and implementation roadmap for `applmaps`.
+This document specifies the full architecture, API surface, data models, and implementation roadmap for `applemaps`.
 
 ---
 
@@ -10,7 +10,7 @@ This document specifies the full architecture, API surface, data models, and imp
 
 Peter Steinberger's "Shipping at Inference Speed" describes a 2025 development workflow where AI coding agents handle the bulk of code generation, testing, and iteration. Developers operate at a higher level of abstraction — directing agents, reviewing outputs, and shipping fast. This workflow demands tools that are **agent-first**: structured output, no interactive prompts, predictable behavior, and composability with other CLI tools.
 
-Apple Maps has no official CLI interface. Developers who want to geocode an address, calculate an ETA, or search for nearby coffee shops must either write a full Swift app, use the paid Maps Server REST API, or manually construct `maps://` URLs. `applmaps` eliminates this gap by exposing MapKit's powerful non-UI capabilities as simple terminal commands.
+Apple Maps has no official CLI interface. Developers who want to geocode an address, calculate an ETA, or search for nearby coffee shops must either write a full Swift app, use the paid Maps Server REST API, or manually construct `maps://` URLs. `applemaps` eliminates this gap by exposing MapKit's powerful non-UI capabilities as simple terminal commands.
 
 The core design principles are:
 
@@ -26,11 +26,11 @@ The core design principles are:
 
 ### System design overview
 
-`applmaps` is a **native macOS Swift CLI tool** that links against MapKit and CoreLocation frameworks. This is the optimal approach because MapKit's non-UI services — geocoding, local search, directions, and ETA calculation — all function without any graphical context, require **no API key**, and have no published hard rate limits for reasonable usage.
+`applemaps` is a **native macOS Swift CLI tool** that links against MapKit and CoreLocation frameworks. This is the optimal approach because MapKit's non-UI services — geocoding, local search, directions, and ETA calculation — all function without any graphical context, require **no API key**, and have no published hard rate limits for reasonable usage.
 
 ```
 ┌──────────────────────────────────────────────────┐
-│                  applmaps CLI                     │
+│                  applemaps CLI                     │
 │  ┌──────────────┐  ┌──────────────────────────┐  │
 │  │ ArgumentParser│  │   Output Formatter       │  │
 │  │ (command      │  │  (JSON / Text / Table)   │  │
@@ -77,21 +77,21 @@ For a macOS CLI tool, **native MapKit is the clear winner** — zero configurati
 import PackageDescription
 
 let package = Package(
-    name: "applmaps",
+    name: "applemaps",
     platforms: [.macOS(.v13)],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.0")
     ],
     targets: [
         .executableTarget(
-            name: "applmaps",
+            name: "applemaps",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ]
         ),
         .testTarget(
-            name: "applmapsTests",
-            dependencies: ["applmaps"]
+            name: "AppleMapsCLITests",
+            dependencies: ["applemaps"]
         )
     ]
 )
@@ -103,7 +103,7 @@ The tool requires **macOS 13+** (Ventura) for full async/await MapKit support an
 
 ## Apple Maps URL schemes — complete reference
 
-The `open` command in `applmaps` constructs and dispatches these URLs via `NSWorkspace.shared.open()` or the shell `open` command. This is the **only reliable mechanism** for controlling the Maps.app GUI from the command line — Apple Maps has no AppleScript scripting dictionary and cannot be automated via `tell application`.
+The `open` command in `applemaps` constructs and dispatches these URLs via `NSWorkspace.shared.open()` or the shell `open` command. This is the **only reliable mechanism** for controlling the Maps.app GUI from the command line — Apple Maps has no AppleScript scripting dictionary and cannot be automated via `tell application`.
 
 ### Primary URL formats
 
@@ -163,7 +163,7 @@ The URL scheme **cannot** control: highway/toll avoidance, 3D mode or flyover to
 ### Command hierarchy
 
 ```
-applmaps
+applemaps
 ├── search       Search for places, businesses, and points of interest
 ├── directions   Calculate routes with turn-by-turn steps
 ├── eta          Get estimated travel time and distance (lightweight)
@@ -194,19 +194,19 @@ Wraps `MKLocalSearch` with `MKLocalSearch.Request`. Supports natural language qu
 
 ```bash
 # Basic search
-applmaps search "coffee shops"
+applemaps search "coffee shops"
 
 # Search near a location
-applmaps search "pharmacies" --near "37.7749,-122.4194"
+applemaps search "pharmacies" --near "37.7749,-122.4194"
 
 # Search with region constraint
-applmaps search "restaurants" --near "40.7128,-74.0060" --radius 500
+applemaps search "restaurants" --near "40.7128,-74.0060" --radius 500
 
 # Filter by POI category
-applmaps search "food" --category cafe,restaurant --limit 5
+applemaps search "food" --category cafe,restaurant --limit 5
 
 # Human-readable output
-applmaps search "gas stations" --near "37.33,-122.01" -f text
+applemaps search "gas stations" --near "37.33,-122.01" -f text
 ```
 
 **Output schema (JSON):**
@@ -243,17 +243,17 @@ Wraps `MKDirections` to calculate full routes including polylines, distances, tr
 
 ```bash
 # Driving directions between two addresses
-applmaps directions --from "Cupertino, CA" --to "San Francisco, CA"
+applemaps directions --from "Cupertino, CA" --to "San Francisco, CA"
 
 # Walking directions between coordinates
-applmaps directions --from "37.33,-122.01" --to "37.78,-122.41" --mode walking
+applemaps directions --from "37.33,-122.01" --to "37.78,-122.41" --mode walking
 
 # Transit directions with alternate routes
-applmaps directions --from "San Jose, CA" --to "San Francisco, CA" \
+applemaps directions --from "San Jose, CA" --to "San Francisco, CA" \
   --mode transit --alternatives
 
 # Get directions and open in Maps.app
-applmaps directions --from "home" --to "SFO Airport" --mode driving --open
+applemaps directions --from "home" --to "SFO Airport" --mode driving --open
 ```
 
 **Output schema (JSON):**
@@ -293,13 +293,13 @@ Wraps `MKDirections.calculateETA()` for fast, traffic-aware travel time and dist
 
 ```bash
 # ETA from current concept to one destination
-applmaps eta --from "Cupertino, CA" --to "San Francisco, CA"
+applemaps eta --from "Cupertino, CA" --to "San Francisco, CA"
 
 # Multiple destinations
-applmaps eta --from "37.33,-122.01" --to "SFO" --to "SJC" --to "OAK"
+applemaps eta --from "37.33,-122.01" --to "SFO" --to "SJC" --to "OAK"
 
 # Specific transport mode and departure time
-applmaps eta --from "home" --to "work" --mode transit --depart "2025-03-01T08:00:00"
+applemaps eta --from "home" --to "work" --mode transit --depart "2025-03-01T08:00:00"
 ```
 
 ### Feature 4: `geocode` / `reverse` — coordinate conversion
@@ -308,13 +308,13 @@ Wraps `CLGeocoder` for forward and reverse geocoding.
 
 ```bash
 # Forward geocode: address → coordinates
-applmaps geocode "1 Apple Park Way, Cupertino, CA"
+applemaps geocode "1 Apple Park Way, Cupertino, CA"
 
 # Reverse geocode: coordinates → address
-applmaps reverse 37.3349 -122.0090
+applemaps reverse 37.3349 -122.0090
 
 # Batch geocode from stdin (one address per line)
-cat addresses.txt | applmaps geocode --stdin
+cat addresses.txt | applemaps geocode --stdin
 ```
 
 **Output schema (JSON):**
@@ -346,19 +346,19 @@ Constructs `maps://` URLs and dispatches them via `NSWorkspace` to control the M
 
 ```bash
 # Open Maps centered on a location
-applmaps open --location "37.7749,-122.4194" --zoom 15
+applemaps open --location "37.7749,-122.4194" --zoom 15
 
 # Open search results in Maps
-applmaps open --search "restaurants near Times Square"
+applemaps open --search "restaurants near Times Square"
 
 # Open directions in Maps
-applmaps open --directions --from "Cupertino" --to "SFO" --mode driving
+applemaps open --directions --from "Cupertino" --to "SFO" --mode driving
 
 # Drop a labeled pin
-applmaps pin 37.7749 -122.4194 --label "Meeting Point"
+applemaps pin 37.7749 -122.4194 --label "Meeting Point"
 
 # Open with satellite view
-applmaps open --search "Grand Canyon" --map-type satellite
+applemaps open --search "Grand Canyon" --map-type satellite
 ```
 
 These commands return the constructed URL in the JSON output, enabling agents to verify what was dispatched:
@@ -526,9 +526,9 @@ struct OutputFormatter {
 import ArgumentParser
 
 @main
-struct ApplMaps: AsyncParsableCommand {
+struct AppleMapsCLI: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "applmaps",
+        commandName: "applemaps",
         abstract: "Apple Maps from the command line — agent-first.",
         version: "0.1.0",
         subcommands: [
@@ -549,7 +549,7 @@ Each subcommand conforms to `AsyncParsableCommand` since all MapKit operations a
 
 ### Build and distribution
 
-The tool compiles to a single static binary via `swift build -c release`. Distribution options include Homebrew tap (`brew install steipete/tap/applmaps`), direct download of the universal binary (arm64 + x86_64 via `lipo`), or Mint (`mint install steipete/applmaps`). No code signing or notarization is strictly required for developer tools distributed outside the App Store, though notarization is recommended for broader distribution.
+The tool compiles to a single static binary via `swift build -c release`. Distribution options include Homebrew tap (`brew install steipete/tap/applemaps`), direct download of the universal binary (arm64 + x86_64 via `lipo`), or Mint (`mint install steipete/applemaps`). No code signing or notarization is strictly required for developer tools distributed outside the App Store, though notarization is recommended for broader distribution.
 
 ---
 
@@ -557,7 +557,7 @@ The tool compiles to a single static binary via `swift build -c release`. Distri
 
 ### MCP (Model Context Protocol) server mode
 
-`applmaps` can double as an MCP server for direct AI agent integration. Running `applmaps mcp` starts a stdio-based MCP server that exposes each command as a typed tool:
+`applemaps` can double as an MCP server for direct AI agent integration. Running `applemaps mcp` starts a stdio-based MCP server that exposes each command as a typed tool:
 
 ```json
 {
@@ -596,23 +596,23 @@ The tool compiles to a single static binary via `swift build -c release`. Distri
 }
 ```
 
-This allows Claude, GPT, and other LLM agents to discover and call `applmaps` capabilities dynamically without pre-programmed knowledge of the CLI syntax.
+This allows Claude, GPT, and other LLM agents to discover and call `applemaps` capabilities dynamically without pre-programmed knowledge of the CLI syntax.
 
 ### Composability examples for agent workflows
 
 ```bash
 # Agent: "Find the nearest coffee shop and get walking directions"
-SHOP=$(applmaps search "coffee" --near "37.78,-122.41" --limit 1 | jq -r '.results[0].coordinate | "\(.lat),\(.lon)"')
-applmaps directions --from "37.78,-122.41" --to "$SHOP" --mode walking
+SHOP=$(applemaps search "coffee" --near "37.78,-122.41" --limit 1 | jq -r '.results[0].coordinate | "\(.lat),\(.lon)"')
+applemaps directions --from "37.78,-122.41" --to "$SHOP" --mode walking
 
 # Agent: "What's the ETA to all three airports from my hotel?"
-applmaps eta --from "Union Square, SF" --to "SFO" --to "OAK" --to "SJC" | jq '.results[] | {dest: .destination, time: .travelTimeText}'
+applemaps eta --from "Union Square, SF" --to "SFO" --to "OAK" --to "SJC" | jq '.results[] | {dest: .destination, time: .travelTimeText}'
 
 # Agent: "Geocode this list of addresses and find the centroid"
-cat addresses.txt | applmaps geocode --stdin | jq '[.results[].coordinate] | {lat: (map(.lat) | add / length), lon: (map(.lon) | add / length)}'
+cat addresses.txt | applemaps geocode --stdin | jq '[.results[].coordinate] | {lat: (map(.lat) | add / length), lon: (map(.lon) | add / length)}'
 
 # Agent: "Show me this route on the map"
-applmaps open --directions --from "Cupertino" --to "Palo Alto" --mode cycling --map-type satellite
+applemaps open --directions --from "Cupertino" --to "Palo Alto" --mode cycling --map-type satellite
 ```
 
 ---
@@ -653,14 +653,14 @@ Add `directions` with full turn-by-turn step output, `open` and `pin` commands f
 
 ### Phase 3: Agent integration (weeks 5–6)
 
-Build the MCP server mode (`applmaps mcp`) for native LLM agent integration, add shell completion generation for zsh/bash/fish, implement `applmaps --json-schema` that dumps the full input/output schema for all commands (enabling agent self-discovery), and add a `--fields` flag for selective JSON output following the GitHub CLI pattern.
+Build the MCP server mode (`applemaps mcp`) for native LLM agent integration, add shell completion generation for zsh/bash/fish, implement `applemaps --json-schema` that dumps the full input/output schema for all commands (enabling agent self-discovery), and add a `--fields` flag for selective JSON output following the GitHub CLI pattern.
 
 ### Phase 4: Advanced features (weeks 7–8)
 
-Add search autocompletion (`applmaps complete "star"`), POI category listing (`applmaps categories`), support for the Apple Maps Server REST API as an alternative backend (`--backend server`), and the Maps Web Snapshot URL generator for producing static map images. This phase also explores Apple's newer unified Maps URL format (introduced in iOS 18.4) for richer `open` commands.
+Add search autocompletion (`applemaps complete "star"`), POI category listing (`applemaps categories`), support for the Apple Maps Server REST API as an alternative backend (`--backend server`), and the Maps Web Snapshot URL generator for producing static map images. This phase also explores Apple's newer unified Maps URL format (introduced in iOS 18.4) for richer `open` commands.
 
 ---
 
 ## Conclusion
 
-`applmaps` fills a genuine gap in the macOS developer toolchain. The fact that MapKit's most valuable services — search, geocoding, directions, ETAs — all work without any UI context makes a native Swift CLI tool both practical and powerful. By defaulting to JSON output, supporting MCP, and following agent-first design patterns, the tool slots naturally into the AI-augmented development workflows that are becoming standard. The technical risk is low: the underlying MapKit APIs are mature, well-documented, and free to use. The primary constraint is macOS-only execution, which is acceptable given the target audience of Apple developers and macOS-native AI coding agent setups.
+`applemaps` fills a genuine gap in the macOS developer toolchain. The fact that MapKit's most valuable services — search, geocoding, directions, ETAs — all work without any UI context makes a native Swift CLI tool both practical and powerful. By defaulting to JSON output, supporting MCP, and following agent-first design patterns, the tool slots naturally into the AI-augmented development workflows that are becoming standard. The technical risk is low: the underlying MapKit APIs are mature, well-documented, and free to use. The primary constraint is macOS-only execution, which is acceptable given the target audience of Apple developers and macOS-native AI coding agent setups.

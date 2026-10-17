@@ -4,21 +4,21 @@
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:applspeech}",
-            "name": "Debug applspeech",
-            "target": "applspeech",
+            "cwd": "${workspaceFolder}",
+            "name": "Debug applemaps",
+            "target": "AppleMapsCLI",
             "configuration": "debug",
-            "preLaunchTask": "swift: Build Debug applspeech"
+            "preLaunchTask": "swift: Build Debug applemaps"
         },
         {
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:applspeech}",
-            "name": "Release applspeech",
-            "target": "applspeech",
+            "cwd": "${workspaceFolder}",
+            "name": "Release applemaps",
+            "target": "AppleMapsCLI",
             "configuration": "release",
-            "preLaunchTask": "swift: Build Release applspeech"
+            "preLaunchTask": "swift: Build Release applemaps"
         }
     ]
 }

@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import applmaps
+@testable import AppleMapsCLI
 
 @Suite("JSON Output Formatter Tests")
 struct JSONOutputFormatterTests {

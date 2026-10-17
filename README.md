@@ -1,12 +1,16 @@
-# applmaps
+# AppleMapsCLI
 
-Agent-first Apple Maps CLI for macOS, built with Swift 6.
+Native Apple Maps CLI for macOS, built with Swift 6. The executable is `applemaps`.
 
-`applmaps` provides scriptable access to Apple Maps capabilities including geocoding, reverse geocoding, search, autocomplete, directions, ETA, URL opening, pin dropping, and POI category listing.
+Forked from [rastreus/applmaps](https://github.com/rastreus/applmaps) under the MIT license; this fork adds ordered multi-stop routes.
+
+`applemaps` provides scriptable access to Apple Maps capabilities including geocoding, reverse geocoding, search, autocomplete, directions, ETA, URL opening, pin dropping, and POI category listing.
 
 ## Status
 
+- Free to use with native MapKit; no API key or separate paid mapping service required.
 - CLI-first tool with JSON output by default.
+- No built-in telemetry.
 - No MCP server mode.
 - No web API mode.
 
@@ -18,6 +22,8 @@ Agent-first Apple Maps CLI for macOS, built with Swift 6.
 ## Build
 
 ```bash
+git clone https://github.com/chiimagnus/AppleMapsCLI.git
+cd AppleMapsCLI
 swift build
 ```
 
@@ -42,7 +48,7 @@ swift test --disable-sandbox
 ## Run
 
 ```bash
-.build/debug/applmaps --help
+.build/debug/applemaps --help
 ```
 
 ## Commands
@@ -65,28 +71,28 @@ completions  Generate shell completion scripts (zsh, bash, fish)
 ### Geocode and reverse
 
 ```bash
-.build/debug/applmaps geocode "1 Apple Park Way, Cupertino, CA"
-.build/debug/applmaps reverse 37.3349 -122.0090
+.build/debug/applemaps geocode "1 Apple Park Way, Cupertino, CA"
+.build/debug/applemaps reverse 37.3349 -122.0090
 ```
 
 ### Batch geocode from stdin
 
 ```bash
-printf "Seattle, WA\nPortland, OR\n" | .build/debug/applmaps geocode --stdin
+printf "Seattle, WA\nPortland, OR\n" | .build/debug/applemaps geocode --stdin
 ```
 
 ### Search and autocomplete
 
 ```bash
-.build/debug/applmaps search "coffee" --near "37.7749,-122.4194" --radius 1500 --limit 5
-.build/debug/applmaps complete "star" --limit 10
+.build/debug/applemaps search "coffee" --near "37.7749,-122.4194" --radius 1500 --limit 5
+.build/debug/applemaps complete "star" --limit 10
 ```
 
 ### Directions and ETA
 
 ```bash
-.build/debug/applmaps directions --from "San Francisco, CA" --to "San Jose, CA" --mode driving
-.build/debug/applmaps eta --from "San Francisco, CA" --to "Oakland, CA" --to "Berkeley, CA"
+.build/debug/applemaps directions --from "San Francisco, CA" --to "San Jose, CA" --mode driving
+.build/debug/applemaps eta --from "San Francisco, CA" --to "Oakland, CA" --to "Berkeley, CA"
 ```
 
 ### Multistop road trip
@@ -94,12 +100,12 @@ printf "Seattle, WA\nPortland, OR\n" | .build/debug/applmaps geocode --stdin
 Use `--via` multiple times to keep intermediate stops in the requested order:
 
 ```bash
-.build/debug/applmaps directions \
+.build/debug/applemaps directions \
   --from "北京市" --via "洛阳市" --via "芜湖市" \
   --via "杭州市" --to "上海市" --mode driving \
   > trip.json
 
-.build/debug/applmaps open \
+.build/debug/applemaps open \
   --from "北京市" --via "洛阳市" --via "芜湖市" \
   --via "杭州市" --to "上海市" --mode driving
 ```
@@ -112,16 +118,16 @@ Use `--via` multiple times to keep intermediate stops in the requested order:
 ### Open and pin
 
 ```bash
-.build/debug/applmaps open --search "coffee near Union Square"
-.build/debug/applmaps open --location "37.3349,-122.0090" --zoom 15
-.build/debug/applmaps pin 37.3349 -122.0090 --label "Apple Park"
+.build/debug/applemaps open --search "coffee near Union Square"
+.build/debug/applemaps open --location "37.3349,-122.0090" --zoom 15
+.build/debug/applemaps pin 37.3349 -122.0090 --label "Apple Park"
 ```
 
 ### Categories and shell completions
 
 ```bash
-.build/debug/applmaps categories --format table
-.build/debug/applmaps completions zsh
+.build/debug/applemaps categories --format table
+.build/debug/applemaps completions zsh
 ```
 
 ## Output Contract
@@ -154,16 +160,17 @@ Where supported (`directions`, `eta`, `open`):
 
 ```bash
 swift build -c release
-cp .build/release/applmaps /usr/local/bin/applmaps
+mkdir -p ~/.local/bin
+install -m 755 .build/release/applemaps ~/.local/bin/applemaps
 ```
 
 ## Development Notes
 
 - Source layout:
-  - `Sources/applmaps/Utilities`
-  - `Sources/applmaps/Core`
-  - `Sources/applmaps/Output`
-  - `Sources/applmaps/Commands`
+  - `Sources/AppleMapsCLI/Utilities`
+  - `Sources/AppleMapsCLI/Core`
+  - `Sources/AppleMapsCLI/Output`
+  - `Sources/AppleMapsCLI/Commands`
 - Tests use Swift Testing (`import Testing`).
 - See `AGENTS.md` for architecture and project constraints.
 - See `docs/SKILL.md` for OpenClaw AgentSkill guidance.

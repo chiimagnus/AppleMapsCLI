@@ -1,4 +1,4 @@
-# Product Requirements Document: `applmaps`
+# Product Requirements Document: AppleMapsCLI (`applemaps`)
 
 **Version:** 1.0  
 **Date:** 2025-02-15  
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-`applmaps` is a native macOS command-line tool that provides programmatic access to Apple Maps services. It wraps MapKit's non-UI APIs (search, geocoding, directions, ETA calculation) and the `maps://` URL scheme to give developers and AI coding agents structured, machine-readable access to Apple Maps without opening Xcode or launching a GUI application.
+`applemaps` is a native macOS command-line tool that provides programmatic access to Apple Maps services. It wraps MapKit's non-UI APIs (search, geocoding, directions, ETA calculation) and the `maps://` URL scheme to give developers and AI coding agents structured, machine-readable access to Apple Maps without opening Xcode or launching a GUI application.
 
 ### Problem Statement
 
@@ -98,8 +98,8 @@ Search for places, businesses, and points of interest using natural language que
 - Return structured JSON with name, address, coordinates, phone, URL, category
 
 **Acceptance Criteria:**
-- `applmaps search "coffee"` returns ≤10 results as JSON
-- `applmaps search "pizza" --near "37.78,-122.41" --radius 500` returns results within 500m
+- `applemaps search "coffee"` returns ≤10 results as JSON
+- `applemaps search "pizza" --near "37.78,-122.41" --radius 500` returns results within 500m
 - Results include all documented fields (name, coordinate, address, etc.)
 - Invalid coordinates return exit code 1
 - Network errors return exit code 2
@@ -121,9 +121,9 @@ Convert between addresses and coordinates using Apple's geocoding service.
 - Process geocode batches sequentially (respect CLGeocoder guidance)
 
 **Acceptance Criteria:**
-- `applmaps geocode "1 Apple Park Way, Cupertino"` returns coordinates
-- `applmaps reverse 37.3349 -122.0090` returns formatted address
-- `cat addresses.txt | applmaps geocode --stdin` processes all addresses
+- `applemaps geocode "1 Apple Park Way, Cupertino"` returns coordinates
+- `applemaps reverse 37.3349 -122.0090` returns formatted address
+- `cat addresses.txt | applemaps geocode --stdin` processes all addresses
 - Batch mode processes sequentially (no parallel CLGeocoder instances)
 - Invalid addresses return exit code 3 (no results)
 
@@ -143,7 +143,7 @@ Calculate routes with turn-by-turn instructions between two locations.
 - Optional `--open` flag to also open route in Maps.app GUI
 
 **Acceptance Criteria:**
-- `applmaps directions --from "Cupertino" --to "San Francisco"` returns route JSON
+- `applemaps directions --from "Cupertino" --to "San Francisco"` returns route JSON
 - `--mode walking` calculates pedestrian route
 - `--alternatives` returns 2-3 route options when available
 - Steps array includes instruction text and distance for each turn
@@ -164,8 +164,8 @@ Get estimated travel time and distance without full route details.
 - Transport mode support (driving, walking, transit)
 
 **Acceptance Criteria:**
-- `applmaps eta --from "SF" --to "Oakland"` returns travel time in seconds + text
-- `applmaps eta --from "home" --to "SFO" --to "OAK" --to "SJC"` returns all three ETAs
+- `applemaps eta --from "SF" --to "Oakland"` returns travel time in seconds + text
+- `applemaps eta --from "home" --to "SFO" --to "OAK" --to "SJC"` returns all three ETAs
 - Travel time reflects current traffic conditions
 - JSON includes both numeric (seconds) and human-readable (text) formats
 
@@ -185,10 +185,10 @@ Control the Apple Maps graphical application via URL scheme.
 - Return constructed URL in JSON output for verification
 
 **Acceptance Criteria:**
-- `applmaps open --search "coffee"` opens Maps with search results
-- `applmaps open --location "37.78,-122.41" --zoom 15` centers map at location
-- `applmaps pin 37.78 -122.41 --label "Meeting Point"` drops labeled pin
-- `applmaps open --directions --from "SF" --to "Oakland" --mode transit` opens route
+- `applemaps open --search "coffee"` opens Maps with search results
+- `applemaps open --location "37.78,-122.41" --zoom 15` centers map at location
+- `applemaps pin 37.78 -122.41 --label "Meeting Point"` drops labeled pin
+- `applemaps open --directions --from "SF" --to "Oakland" --mode transit` opens route
 - Commands return immediately (don't block waiting for Maps)
 
 ---
@@ -209,8 +209,8 @@ Default to machine-readable JSON; support human-friendly formats.
 
 **Acceptance Criteria:**
 - Default output is valid, parseable JSON
-- `applmaps search "coffee" | jq '.results[0].name'` works
-- `applmaps search "coffee" --format text` produces readable prose
+- `applemaps search "coffee" | jq '.results[0].name'` works
+- `applemaps search "coffee" --format text` produces readable prose
 - `--fields name,coordinate` returns only those fields in JSON
 - isatty check: pretty JSON when outputting to terminal directly
 
@@ -228,7 +228,7 @@ Programmatic error handling through consistent exit codes.
 - Exit 3: No results found (empty search/geocode)
 
 **Acceptance Criteria:**
-- `applmaps geocode "invalid garbage" || echo $?` prints "3"
+- `applemaps geocode "invalid garbage" || echo $?` prints "3"
 - Invalid flag usage exits with code 1
 - Network timeouts exit with code 2
 - All commands respect exit code contract
@@ -272,62 +272,62 @@ Programmatic error handling through consistent exit codes.
 - Implement `geocode` command with single address input
 - Return JSON with coordinate, formatted address, timezone
 - Handle "no results" with exit code 3
-- Acceptance: `applmaps geocode "Apple Park"` returns valid JSON
+- Acceptance: `applemaps geocode "Apple Park"` returns valid JSON
 
 **S02: As a scripter, I want to reverse geocode coordinates so I can display human-readable locations**
 - Implement `reverse` command accepting lat/lon arguments
 - Return Address object with all fields
-- Acceptance: `applmaps reverse 37.33 -122.01` returns address
+- Acceptance: `applemaps reverse 37.33 -122.01` returns address
 
 **S03: As an agent, I want to search for nearby places so I can find businesses programmatically**
 - Implement `search` command with query + optional `--near` and `--radius`
 - Return array of Place objects with all documented fields
-- Acceptance: `applmaps search "restaurants" --near "40.71,-74.00" --limit 5`
+- Acceptance: `applemaps search "restaurants" --near "40.71,-74.00" --limit 5`
 
 **S04: As a scripter, I want to get travel time estimates so I can optimize routes**
 - Implement `eta` command with from/to arguments
 - Support multiple `--to` destinations
-- Acceptance: `applmaps eta --from "SF" --to "Oakland" --to "SJC"`
+- Acceptance: `applemaps eta --from "SF" --to "Oakland" --to "SJC"`
 
 ### Phase 2: Directions & GUI Control
 
 **S05: As a developer, I want full route directions so I can display turn-by-turn navigation**
 - Implement `directions` command with from/to and transport mode
 - Return Route array with steps, distance, duration
-- Acceptance: `applmaps directions --from "Cupertino" --to "SF" --mode driving`
+- Acceptance: `applemaps directions --from "Cupertino" --to "SF" --mode driving`
 
 **S06: As a scripter, I want to batch geocode addresses so I can process large datasets**
 - Add `--stdin` mode to `geocode` command
 - Process one address per line sequentially
-- Acceptance: `cat addresses.txt | applmaps geocode --stdin | jq '.results[].coordinate'`
+- Acceptance: `cat addresses.txt | applemaps geocode --stdin | jq '.results[].coordinate'`
 
 **S07: As a user, I want to open Maps at a specific location so I can visualize programmatically**
 - Implement `open` command with search/location/directions modes
 - Construct and dispatch proper `maps://` URLs
-- Acceptance: `applmaps open --location "37.78,-122.41" --zoom 14`
+- Acceptance: `applemaps open --location "37.78,-122.41" --zoom 14`
 
 **S08: As a developer, I want to drop labeled pins so I can mark specific points**
 - Implement `pin` command with coordinate + label
-- Acceptance: `applmaps pin 37.78 -122.41 --label "Office"`
+- Acceptance: `applemaps pin 37.78 -122.41 --label "Office"`
 
 ### Phase 3: Agent Integration
 
 **S09: As an AI agent, I want structured tool schemas so I can discover capabilities**
-- Implement MCP server mode (`applmaps mcp`)
+- Implement MCP server mode (`applemaps mcp`)
 - Expose all commands as typed MCP tools
-- Acceptance: Claude Desktop can call applmaps tools via MCP
+- Acceptance: Claude Desktop can call applemaps tools via MCP
 
 **S10: As an agent, I want field projection so I can minimize token usage**
 - Implement `--fields` flag for all commands
 - Support comma-separated field list
-- Acceptance: `applmaps search "coffee" --fields name,coordinate | jq .`
+- Acceptance: `applemaps search "coffee" --fields name,coordinate | jq .`
 
 **S11: As a scripter, I want shell completions so I can use the tool efficiently**
 - Generate zsh/bash/fish completions
 - Acceptance: Tab completion works for all commands and flags
 
 **S12: As a developer, I want JSON schema export so I can validate outputs**
-- Implement `applmaps --json-schema <command>` flag
+- Implement `applemaps --json-schema <command>` flag
 - Export complete input/output schema for each command
 - Acceptance: Agents can ingest schema for self-documentation
 
@@ -335,17 +335,17 @@ Programmatic error handling through consistent exit codes.
 
 **S13: As a developer, I want search autocomplete so I can build type-ahead UIs**
 - Implement `complete` command for search query completion
-- Acceptance: `applmaps complete "star"` returns "Starbucks", "Star Market", etc.
+- Acceptance: `applemaps complete "star"` returns "Starbucks", "Star Market", etc.
 
 **S14: As a user, I want to list POI categories so I know what filters are available**
 - Implement `categories` command
 - Return all available MKPointOfInterestCategory values
-- Acceptance: `applmaps categories --format table`
+- Acceptance: `applemaps categories --format table`
 
 **S15: As an enterprise user, I want to use the REST API backend for higher quotas**
 - Implement `--backend server` flag
 - Support Apple Maps Server API as alternative to local MapKit
-- Acceptance: `applmaps search "coffee" --backend server` (requires API key in config)
+- Acceptance: `applemaps search "coffee" --backend server` (requires API key in config)
 
 ---
 
@@ -412,7 +412,7 @@ Programmatic error handling through consistent exit codes.
 ### Future Consideration (Post-1.0)
 - ⏸️ Apple Maps Server API as primary backend
 - ⏸️ Cross-platform support via Server API
-- ⏸️ Configuration file support (~/.applmapsrc)
+- ⏸️ Configuration file support (~/.applemapsrc)
 - ⏸️ Persistent caching of geocoding results
 - ⏸️ Maps Web Snapshot API for static map images
 - ⏸️ Integration with Apple Shortcuts

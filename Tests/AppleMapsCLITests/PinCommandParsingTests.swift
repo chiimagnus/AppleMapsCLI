@@ -1,5 +1,5 @@
 import Testing
-@testable import applmaps
+@testable import AppleMapsCLI
 
 @Suite("Pin Command Parsing Tests")
 struct PinCommandParsingTests {

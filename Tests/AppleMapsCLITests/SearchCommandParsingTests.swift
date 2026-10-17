@@ -1,5 +1,5 @@
 import Testing
-@testable import applmaps
+@testable import AppleMapsCLI
 
 @Suite("Search Command Parsing Tests")
 struct SearchCommandParsingTests {

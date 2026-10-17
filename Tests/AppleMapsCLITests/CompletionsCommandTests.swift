@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import applmaps
+@testable import AppleMapsCLI
 
 @Suite("Completions Command Parsing Tests")
 struct CompletionsCommandParsingTests {
@@ -45,18 +45,18 @@ struct CompletionsScriptGenerationTests {
         CompletionsCommand.Shell.fish
     ])
     func generateScript(shell: CompletionsCommand.Shell) throws {
-        let executablePath = FileManager.default.currentDirectoryPath + "/.build/debug/applmaps"
+        let executablePath = FileManager.default.currentDirectoryPath + "/.build/debug/applemaps"
         let script = try CompletionsCommand.generateScript(shell: shell, executablePath: executablePath)
 
         #expect(!script.isEmpty)
 
         switch shell {
         case .zsh:
-            #expect(script.contains("#compdef applmaps"))
+            #expect(script.contains("#compdef applemaps"))
         case .bash:
-            #expect(script.contains("complete -o filenames -F _applmaps applmaps"))
+            #expect(script.contains("complete -o filenames -F _applemaps applemaps"))
         case .fish:
-            #expect(script.contains("complete -c 'applmaps'"))
+            #expect(script.contains("complete -c 'applemaps'"))
         }
     }
 }

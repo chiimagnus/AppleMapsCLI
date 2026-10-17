@@ -1,6 +1,6 @@
-# AGENTS.md — applmaps (Codex-native instructions)
+# AGENTS.md — AppleMapsCLI (Codex-native instructions)
 
-**Project:** `applmaps` — agent-first Apple Maps CLI for macOS (Swift 6, SwiftPM).  
+**Project:** `AppleMapsCLI` — executable `applemaps`, native Apple Maps CLI for macOS (Swift 6, SwiftPM).
 **Goal:** Programmatic access to Apple Maps capabilities (search, geocode, reverse, ETA, directions) + GUI control via `maps://` URLs.  
 **CLI Contract:** JSON-first, zero interactivity, semantic exit codes, pipe-friendly.
 
@@ -63,7 +63,7 @@ When operating in autonomous mode (Codex/Ralph loops):
 
 **CRITICAL:** Before writing ANY Swift code, read the Swift 6 skill document:
 
-📖 **[`.agents/skills/swift6/SKILL.md`](https://raw.githubusercontent.com/rastreus/applspeech/refs/heads/main/.agents/skills/swift6/SKILL.md)**
+📖 **[`.agents/skills/swift6/SKILL.md`](.agents/skills/swift6/SKILL.md)**
 
 This document covers:
 - **Swift 6.2.3 strict concurrency** — Sendable protocol requirements, actor isolation
@@ -209,7 +209,7 @@ Utilities/ → Core/ → Output/ → Commands/ → @main
 
 Command tree:
 ```
-applmaps
+applemaps
 ├── search       MKLocalSearch (query, near/radius, categories, limit)
 ├── directions   MKDirections (routes + steps, optional alternatives, optional --open)
 ├── eta          MKDirections.calculateETA (supports multiple --to)
@@ -346,7 +346,7 @@ struct SearchResult: Sendable {
 ### Use Swift Testing (NOT XCTest)
 ```swift
 import Testing
-@testable import ApplMaps
+@testable import AppleMapsCLI
 
 @Suite("Coordinate Parsing Tests")
 struct CoordinateTests {
@@ -494,14 +494,14 @@ if verbose {
 import PackageDescription
 
 let package = Package(
-    name: "applmaps",
+    name: "applemaps",
     platforms: [.macOS(.v13)],  // Ventura for full async MapKit
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
     ],
     targets: [
         .executableTarget(
-            name: "applmaps",
+            name: "applemaps",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
@@ -510,8 +510,8 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "applmapsTests",
-            dependencies: ["applmaps"]
+            name: "AppleMapsCLITests",
+            dependencies: ["applemaps"]
         )
     ],
     swiftLanguageModes: [.v6]
@@ -545,7 +545,7 @@ This section accumulates learnings from implementation iterations. When you disc
 
 ### ArgumentParser Subcommand Names — Set commandName explicitly
 **Discovered in:** Iteration 1, Story S01
-**Context:** `applmaps geocode "Apple Park"` was rejected even though `GeocodeCommand` was registered as a subcommand.
+**Context:** `applemaps geocode "Apple Park"` was rejected even though `GeocodeCommand` was registered as a subcommand.
 **Discovery:** ArgumentParser did not expose the intended CLI token from the type name in this setup.
 **Pattern:** Always set `commandName` in each command's `CommandConfiguration`.
 
@@ -562,11 +562,11 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Discovered in:** Iteration 1, Story S01
 **Context:** Build failed after adding more source files with `@main` still inside `Sources/.../main.swift`.
 **Discovery:** Swift reported `'main' attribute cannot be used in a module that contains top-level code`.
-**Pattern:** Use `@main` in a non-`main.swift` file (e.g., `ApplMaps.swift`) for executable targets with multiple source files.
+**Pattern:** Use `@main` in a non-`main.swift` file (e.g., `AppleMapsCLI.swift`) for executable targets with multiple source files.
 
 ### Negative Coordinate Parsing — Use passthrough positional capture
 **Discovered in:** Iteration 2, Story S02
-**Context:** `applmaps reverse 37.3349 -122.0090` parsed `-122.0090` as an option instead of a positional value.
+**Context:** `applemaps reverse 37.3349 -122.0090` parsed `-122.0090` as an option instead of a positional value.
 **Discovery:** Swift Argument Parser treats dash-prefixed positionals as options under default positional parsing.
 **Pattern:** For commands that accept signed numeric positional values, capture coordinates as `@Argument(parsing: .captureForPassthrough) [String]` and parse/validate manually in the command or runner.
 
@@ -602,7 +602,7 @@ struct GeocodeCommand: AsyncParsableCommand {
 
 ### POI Category Catalog — Maintain explicit category mapping
 **Discovered in:** Iteration 13, Story S13
-**Context:** Implementing `applmaps categories` from `MKPointOfInterestCategory`.
+**Context:** Implementing `applemaps categories` from `MKPointOfInterestCategory`.
 **Discovery:** MapKit does not expose a direct `allCategories` enumeration API suitable for deterministic CLI output.
 **Pattern:** Maintain an explicit ordered mapping of `(id, MKPointOfInterestCategory)` values, emit both CLI-friendly `id` and `mapkit_value`, and normalize output in a runner (dedupe + sort) before formatting to JSON/text/table.
 
@@ -663,15 +663,15 @@ swift test --verbose                  # Verbose test output
 
 ### Run commands
 ```bash
-.build/debug/applmaps search "coffee"
-.build/debug/applmaps geocode "Apple Park"
-.build/debug/applmaps eta --from "SF" --to "Oakland"
+.build/debug/applemaps search "coffee"
+.build/debug/applemaps geocode "Apple Park"
+.build/debug/applemaps eta --from "SF" --to "Oakland"
 ```
 
 ### Install (once implemented)
 ```bash
 swift build -c release
-cp .build/release/applmaps /usr/local/bin/
+cp .build/release/applemaps /usr/local/bin/
 ```
 
 ---
@@ -681,7 +681,7 @@ cp .build/release/applmaps /usr/local/bin/
 **Use this prompt to start fully autonomous development:**
 
 ```
-You are an autonomous software development agent working on the applmaps project.
+You are an autonomous software development agent working on the applemaps project.
 
 Your mission: Implement the next incomplete story from prd.json following strict TCR discipline.
 

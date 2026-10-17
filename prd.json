@@ -1,6 +1,6 @@
 {
   "meta": {
-    "project": "applmaps",
+    "project": "applemaps",
     "source": "prd.md",
     "generated_at": "2026-02-16T00:00:00Z",
     "version": "1.0"
@@ -18,7 +18,7 @@
         "Handle no results with exit code 3"
       ],
       "acceptance": [
-        "applmaps geocode \"Apple Park\" returns valid JSON"
+        "applemaps geocode \"Apple Park\" returns valid JSON"
       ],
       "passes": true
     },
@@ -33,7 +33,7 @@
         "Return Address object with all fields"
       ],
       "acceptance": [
-        "applmaps reverse 37.33 -122.01 returns address"
+        "applemaps reverse 37.33 -122.01 returns address"
       ],
       "passes": true
     },
@@ -48,7 +48,7 @@
         "Return array of Place objects with documented fields"
       ],
       "acceptance": [
-        "applmaps search \"restaurants\" --near \"40.71,-74.00\" --limit 5"
+        "applemaps search \"restaurants\" --near \"40.71,-74.00\" --limit 5"
       ],
       "passes": true
     },
@@ -63,7 +63,7 @@
         "Support multiple to destinations"
       ],
       "acceptance": [
-        "applmaps eta --from \"SF\" --to \"Oakland\" --to \"SJC\""
+        "applemaps eta --from \"SF\" --to \"Oakland\" --to \"SJC\""
       ],
       "passes": true
     },
@@ -78,7 +78,7 @@
         "Return Route array with steps, distance, duration"
       ],
       "acceptance": [
-        "applmaps directions --from \"Cupertino\" --to \"SF\" --mode driving"
+        "applemaps directions --from \"Cupertino\" --to \"SF\" --mode driving"
       ],
       "passes": true
     },
@@ -93,7 +93,7 @@
         "Process one address per line sequentially"
       ],
       "acceptance": [
-        "cat addresses.txt | applmaps geocode --stdin"
+        "cat addresses.txt | applemaps geocode --stdin"
       ],
       "passes": true
     },
@@ -108,7 +108,7 @@
         "Construct and dispatch proper maps URLs"
       ],
       "acceptance": [
-        "applmaps open --location \"37.78,-122.41\" --zoom 14"
+        "applemaps open --location \"37.78,-122.41\" --zoom 14"
       ],
       "passes": true
     },
@@ -122,7 +122,7 @@
         "Implement pin with coordinate and optional label"
       ],
       "acceptance": [
-        "applmaps pin 37.78 -122.41 --label \"Office\""
+        "applemaps pin 37.78 -122.41 --label \"Office\""
       ],
       "passes": true
     },
@@ -137,7 +137,7 @@
         "Support comma-separated field list"
       ],
       "acceptance": [
-        "applmaps search \"coffee\" --fields name,coordinate"
+        "applemaps search \"coffee\" --fields name,coordinate"
       ],
       "passes": true
     },
@@ -180,7 +180,7 @@
         "Implement complete command for search query completion"
       ],
       "acceptance": [
-        "applmaps complete \"star\" returns autocomplete suggestions"
+        "applemaps complete \"star\" returns autocomplete suggestions"
       ],
       "passes": true
     },
@@ -194,7 +194,7 @@
         "Implement categories command returning MKPointOfInterestCategory values"
       ],
       "acceptance": [
-        "applmaps categories --format table"
+        "applemaps categories --format table"
       ],
       "passes": true
     }

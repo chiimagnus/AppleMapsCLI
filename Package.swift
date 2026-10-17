@@ -2,14 +2,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "applmaps",
+    name: "AppleMapsCLI",
     platforms: [.macOS(.v13)],
+    products: [
+        .executable(name: "applemaps", targets: ["AppleMapsCLI"])
+    ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
     ],
     targets: [
         .executableTarget(
-            name: "applmaps",
+            name: "AppleMapsCLI",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
@@ -18,8 +21,8 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "applmapsTests",
-            dependencies: ["applmaps"]
+            name: "AppleMapsCLITests",
+            dependencies: ["AppleMapsCLI"]
         )
     ],
     swiftLanguageModes: [.v6]

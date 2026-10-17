@@ -1,9 +1,9 @@
 import ArgumentParser
 
 @main
-struct ApplMaps: AsyncParsableCommand {
+struct AppleMapsCLI: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "applmaps",
+        commandName: "applemaps",
         abstract: "Agent-first Apple Maps CLI for macOS",
         subcommands: [
             GeocodeCommand.self,
