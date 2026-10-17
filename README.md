@@ -17,7 +17,7 @@ Forked from [rastreus/applmaps](https://github.com/rastreus/applmaps) under the 
 ## Requirements
 
 - macOS 13 or later (`open --via` requires macOS 15.4+)
-- Xcode with Swift 6 toolchain **only when building from source**
+- Xcode 26 or later (Swift 6.2+, MapKit cycling API) **only when building from source**. Xcode 26 requires macOS 15.6+ on the build machine; prebuilt binaries run on macOS 13+.
 
 ## Install
 
