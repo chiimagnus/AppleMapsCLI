@@ -620,6 +620,10 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Context:** Placeholder for future discoveries during implementation  
 **Pattern:** When implemented, document batching approach here
 
+### Multistop Maps URLs vs. MapKit pairwise routing
+**Context:** The Maps app supports adding driving stops manually, but the public `MKDirections.Request` has a single source and destination. `MKMapItem.openMaps` with directions permits at most two items.
+**Pattern:** Repeat `waypoint` parameters in the unified `/directions` URL (macOS 15.4+) to request a multistop preview. The app may still report an unavailable route; opening the URL does not verify route computation. For reliable structured estimates, calculate consecutive two-point `MKDirections` legs and add the first route's distance and duration. Do not automate the Maps app via Accessibility.
+
 ### maps:// URL Quirks — Coordinate snapping behavior
 **Context:** Placeholder for future discoveries during implementation
 **Pattern:** When implemented, document URL construction gotchas here

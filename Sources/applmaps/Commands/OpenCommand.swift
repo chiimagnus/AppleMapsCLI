@@ -20,6 +20,9 @@ struct OpenCommand: AsyncParsableCommand {
     @Option(name: .long, help: "Directions destination query")
     var to: String?
 
+    @Option(name: .long, help: "Intermediate stop; repeat --via for multiple stops")
+    var via: [String] = []
+
     @Option(name: .long, help: "Directions mode: driving, walking, transit, cycling")
     var mode: String = TransportMode.driving.rawValue
 
@@ -49,7 +52,15 @@ struct OpenCommand: AsyncParsableCommand {
 
             let action = try resolveAction()
             let url = try buildURL(for: action)
+            if !via.isEmpty, !ProcessInfo.processInfo.isOperatingSystemAtLeast(
+                OperatingSystemVersion(majorVersion: 15, minorVersion: 4, patchVersion: 0)
+            ) {
+                throw CLIError.network("Multistop Maps links require macOS 15.4 or later.")
+            }
             let opened = await MainActor.run { NSWorkspace.shared.open(url) }
+            guard opened else {
+                throw CLIError.network("Apple Maps could not open the requested URL.")
+            }
 
             let response = OpenResponse(
                 action: action.name,
@@ -83,7 +94,7 @@ struct OpenCommand: AsyncParsableCommand {
     private enum Action {
         case search(String)
         case location(Coordinate)
-        case directions(from: String, to: String, mode: TransportMode)
+        case directions(from: String, via: [String], to: String, mode: TransportMode)
 
         var name: String {
             switch self {
@@ -102,6 +113,7 @@ struct OpenCommand: AsyncParsableCommand {
         let hasLocation = location?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
         let hasDirections = (from?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
             || (to?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
+            || !via.isEmpty
 
         let activeModeCount = [hasSearch, hasLocation, hasDirections]
             .filter { $0 }
@@ -112,14 +124,14 @@ struct OpenCommand: AsyncParsableCommand {
         }
 
         if let search, !search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            guard location == nil, from == nil, to == nil, zoom == nil else {
+            guard location == nil, from == nil, to == nil, zoom == nil, via.isEmpty else {
                 throw CLIError.user("When using --search, do not combine with location or directions options.")
             }
             return .search(search)
         }
 
         if let location, !location.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            guard search == nil, from == nil, to == nil else {
+            guard search == nil, from == nil, to == nil, via.isEmpty else {
                 throw CLIError.user("When using --location, do not combine with search or directions options.")
             }
             guard let coordinate = Coordinate(string: location) else {
@@ -135,8 +147,11 @@ struct OpenCommand: AsyncParsableCommand {
             throw CLIError.user("Directions mode requires --from and --to.")
         }
 
+        guard zoom == nil else {
+            throw CLIError.user("--zoom is only valid with --location.")
+        }
         let parsedMode = try parseMode(mode)
-        return .directions(from: from, to: to, mode: parsedMode)
+        return .directions(from: from, via: via, to: to, mode: parsedMode)
     }
 
     private func buildURL(for action: Action) throws -> URL {
@@ -146,8 +161,8 @@ struct OpenCommand: AsyncParsableCommand {
                 return try MapsURLBuilder.search(query: query)
             case let .location(coordinate):
                 return try MapsURLBuilder.location(coordinate: coordinate, zoom: zoom)
-            case let .directions(from, to, mode):
-                return try MapsURLBuilder.directions(from: from, to: to, mode: mode)
+            case let .directions(from, via, to, mode):
+                return try MapsURLBuilder.directions(from: from, to: to, mode: mode, via: via)
             }
         } catch let error as MapsURLBuilderError {
             switch error {

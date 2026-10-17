@@ -41,6 +41,16 @@ struct OpenCommandParsingTests {
         #expect(parsed.mode == "walking")
     }
 
+    @Test("Parses repeated ordered waypoints")
+    func parseWaypoints() throws {
+        let parsed = try OpenCommand.parse([
+            "--from", "北京", "--via", "洛阳", "--via", "芜湖",
+            "--via", "杭州", "--to", "上海"
+        ])
+        #expect(parsed.via == ["洛阳", "芜湖", "杭州"])
+        #expect(parsed.mode == "driving")
+    }
+
     @Test("Parses schema flag")
     func parseSchemaFlag() throws {
         let parsed = try OpenCommand.parse(["--json-schema"])

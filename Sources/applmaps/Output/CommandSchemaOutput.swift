@@ -13,7 +13,8 @@ enum CommandSchemaOutput {
         return try JSONOutputFormatter.format(
             schema,
             forcePretty: pretty,
-            fields: fields
+            fields: fields,
+            keyEncodingStrategy: .useDefaultKeys
         )
     }
 }

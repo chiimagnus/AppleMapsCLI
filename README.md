@@ -12,7 +12,7 @@ Agent-first Apple Maps CLI for macOS, built with Swift 6.
 
 ## Requirements
 
-- macOS 13 or later
+- macOS 13 or later (`open --via` requires macOS 15.4+)
 - Xcode with Swift 6 toolchain
 
 ## Build
@@ -88,6 +88,26 @@ printf "Seattle, WA\nPortland, OR\n" | .build/debug/applmaps geocode --stdin
 .build/debug/applmaps directions --from "San Francisco, CA" --to "San Jose, CA" --mode driving
 .build/debug/applmaps eta --from "San Francisco, CA" --to "Oakland, CA" --to "Berkeley, CA"
 ```
+
+### Multistop road trip
+
+Use `--via` multiple times to keep intermediate stops in the requested order:
+
+```bash
+.build/debug/applmaps directions \
+  --from "北京市" --via "洛阳市" --via "芜湖市" \
+  --via "杭州市" --to "上海市" --mode driving \
+  > trip.json
+
+.build/debug/applmaps open \
+  --from "北京市" --via "洛阳市" --via "芜湖市" \
+  --via "杭州市" --to "上海市" --mode driving
+```
+
+- `directions --via` asks MapKit for each **adjacent pair** in sequence and returns `legs`, `total_distance_m`, and `total_duration_s`. Totals sum the first suggested route for each leg; they do not represent one continuous MapKit route. Without `--via`, existing single-route JSON remains unchanged.
+- `open --via` uses Apple's unified multistop Maps URL (macOS 15.4+). It **opens the route request**, but Maps may display "Route Not Available" even when it correctly lists all the stops. URL dispatch success is not proof of navigation availability.
+- Apple Maps may calculate the trip after stops are added manually one by one, but this tool does not script the Maps UI or save to its private route database. Save the JSON to a local file as shown above.
+- No API key, paid routing provider, background service, or telemetry is required.
 
 ### Open and pin
 

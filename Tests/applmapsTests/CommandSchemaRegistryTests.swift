@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import applmaps
 
@@ -34,6 +35,33 @@ struct CommandSchemaRegistryTests {
         #expect(schema?.output.oneOf?.count == 2)
         #expect(schema?.output.oneOf?.first?.properties?["query"] != nil)
         #expect(schema?.output.oneOf?.last?.properties?["count"] != nil)
+    }
+
+    @Test("Directions schemas describe ordered intermediate stops")
+    func directionsWaypointsSchema() {
+        let directions = CommandSchemaRegistry.schema(for: "directions")
+        let open = CommandSchemaRegistry.schema(for: "open")
+
+        #expect(directions?.input.properties?["via"]?.items?.type == "string")
+        #expect(open?.input.properties?["via"]?.items?.type == "string")
+        #expect(directions?.output.oneOf?.count == 2)
+        #expect(directions?.output.oneOf?.first?.properties?["routes"]?.type == "array")
+        #expect(directions?.output.oneOf?.last?.properties?["legs"]?.items?.properties?["routes"]?.type == "array")
+        #expect(directions?.output.oneOf?.last?.properties?["total_distance_m"]?.type == "number")
+    }
+
+    @Test("Rendered JSON Schema retains standard camelCase keywords")
+    func renderedSchemaKeywords() throws {
+        let json = try CommandSchemaOutput.render(
+            command: "directions", pretty: false, fields: nil
+        )
+        let document = try #require(JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any])
+        let output = try #require(document["output"] as? [String: Any])
+        #expect(output["oneOf"] is [[String: Any]])
+        #expect(output["one_of"] == nil)
+        let first = try #require((output["oneOf"] as? [[String: Any]])?.first)
+        #expect(first["additionalProperties"] != nil)
+        #expect(first["additional_properties"] == nil)
     }
 
     @Test("Search schema output includes result place shape")

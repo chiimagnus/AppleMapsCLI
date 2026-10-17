@@ -13,6 +13,9 @@ struct DirectionsCommand: AsyncParsableCommand {
     @Option(name: .long, help: "Destination location query or coordinate in 'lat,lon' format")
     var to: String?
 
+    @Option(name: .long, help: "Intermediate stop; repeat --via in driving order")
+    var via: [String] = []
+
     @Option(name: .long, help: "Transport mode: driving, walking, transit, cycling")
     var mode: String = TransportMode.driving.rawValue
 
@@ -50,18 +53,28 @@ struct DirectionsCommand: AsyncParsableCommand {
             }
 
             let parsedMode = try parseMode(mode)
-            let response = try await runner.execute(
-                from: from,
-                to: to,
-                mode: parsedMode,
-                alternatives: alternatives
-            )
-            let output = try JSONOutputFormatter.format(
-                response,
-                forcePretty: pretty,
-                fields: fields
-            )
-            print(output)
+            if via.isEmpty {
+                let response = try await runner.execute(
+                    from: from,
+                    to: to,
+                    mode: parsedMode,
+                    alternatives: alternatives
+                )
+                print(try JSONOutputFormatter.format(
+                    response, forcePretty: pretty, fields: fields
+                ))
+            } else {
+                let response = try await runner.executeItinerary(
+                    from: from,
+                    via: via,
+                    to: to,
+                    mode: parsedMode,
+                    alternatives: alternatives
+                )
+                print(try JSONOutputFormatter.format(
+                    response, forcePretty: pretty, fields: fields
+                ))
+            }
         } catch let error as CLIError {
             StderrOutput().writeLine(error.message)
             throw ExitCode(rawValue: error.exitCode)

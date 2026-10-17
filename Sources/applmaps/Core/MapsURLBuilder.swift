@@ -28,7 +28,12 @@ enum MapsURLBuilder {
         return try buildURL(queryItems: items)
     }
 
-    static func directions(from: String, to: String, mode: TransportMode) throws -> URL {
+    static func directions(
+        from: String,
+        to: String,
+        mode: TransportMode,
+        via: [String] = []
+    ) throws -> URL {
         let trimmedFrom = from.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedFrom.isEmpty else {
             throw MapsURLBuilderError.invalidInput("Origin (--from) cannot be empty.")
@@ -37,6 +42,20 @@ enum MapsURLBuilder {
         let trimmedTo = to.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedTo.isEmpty else {
             throw MapsURLBuilderError.invalidInput("Destination (--to) cannot be empty.")
+        }
+
+        if !via.isEmpty {
+            var items = [URLQueryItem(name: "source", value: trimmedFrom)]
+            for (index, waypoint) in via.enumerated() {
+                let value = waypoint.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !value.isEmpty else {
+                    throw MapsURLBuilderError.invalidInput("Waypoint \(index + 1) cannot be empty.")
+                }
+                items.append(URLQueryItem(name: "waypoint", value: value))
+            }
+            items.append(URLQueryItem(name: "destination", value: trimmedTo))
+            items.append(URLQueryItem(name: "mode", value: mode.rawValue))
+            return try buildURL(queryItems: items, path: "/directions")
         }
 
         let flag: String
@@ -73,10 +92,14 @@ enum MapsURLBuilder {
         return try buildURL(queryItems: items)
     }
 
-    private static func buildURL(queryItems: [URLQueryItem]) throws -> URL {
+    private static func buildURL(
+        queryItems: [URLQueryItem],
+        path: String = ""
+    ) throws -> URL {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "maps.apple.com"
+        components.path = path
         components.queryItems = queryItems
 
         guard let url = components.url else {

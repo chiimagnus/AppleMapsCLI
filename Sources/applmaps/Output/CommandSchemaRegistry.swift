@@ -392,6 +392,7 @@ enum CommandSchemaRegistry {
         properties: [
             "from": .string(description: "Origin query or coordinate."),
             "to": .string(description: "Destination query or coordinate."),
+            "via": .array(.string(), description: "Ordered intermediate stops; repeat --via."),
             "mode": transportMode,
             "alternatives": .boolean(description: "Request alternate routes."),
             "fields": .string(description: "Comma-separated JSON fields projection."),
@@ -401,7 +402,7 @@ enum CommandSchemaRegistry {
         required: ["from", "to"]
     )
 
-    private static let directionsOutput = JSONSchemaNode.object(
+    private static let directionsSingleOutput = JSONSchemaNode.object(
         properties: [
             "origin": routeEndpoint,
             "destination": routeEndpoint,
@@ -409,6 +410,26 @@ enum CommandSchemaRegistry {
             "routes": .array(route)
         ],
         required: ["origin", "destination", "transport_type", "routes"]
+    )
+
+    private static let directionsItineraryOutput = JSONSchemaNode.object(
+        properties: [
+            "from": .string(),
+            "via": .array(.string()),
+            "to": .string(),
+            "transport_type": .string(),
+            "total_distance_m": .number(),
+            "total_duration_s": .number(),
+            "legs": .array(directionsSingleOutput)
+        ],
+        required: [
+            "from", "via", "to", "transport_type", "total_distance_m", "total_duration_s", "legs"
+        ]
+    )
+
+    private static let directionsOutput = JSONSchemaNode.oneOf(
+        [directionsSingleOutput, directionsItineraryOutput],
+        description: "Single route or ordered multistop itinerary when --via is present."
     )
 
     private static let etaInput = JSONSchemaNode.object(
@@ -438,6 +459,7 @@ enum CommandSchemaRegistry {
             "location": .string(description: "Coordinate string in 'lat,lon' format."),
             "from": .string(description: "Directions origin query."),
             "to": .string(description: "Directions destination query."),
+            "via": .array(.string(), description: "Ordered waypoints for multistop directions."),
             "mode": transportMode,
             "zoom": .integer(description: "Zoom level for location mode (2...21)."),
             "fields": .string(description: "Comma-separated JSON fields projection."),

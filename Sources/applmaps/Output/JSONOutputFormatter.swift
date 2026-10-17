@@ -10,11 +10,12 @@ enum JSONOutputFormatter {
         _ payload: T,
         forcePretty: Bool,
         fields: String? = nil,
+        keyEncodingStrategy: JSONEncoder.KeyEncodingStrategy = .convertToSnakeCase,
         stdoutIsTTY: Bool = Terminal.isStdoutTTY
     ) throws -> String {
         let prettyPrinted = forcePretty || stdoutIsTTY
         let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
+        encoder.keyEncodingStrategy = keyEncodingStrategy
 
         if prettyPrinted {
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]

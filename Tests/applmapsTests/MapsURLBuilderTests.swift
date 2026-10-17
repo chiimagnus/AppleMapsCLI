@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import applmaps
 
@@ -26,6 +27,33 @@ struct MapsURLBuilderTests {
             mode: .driving
         )
         #expect(url.absoluteString == "https://maps.apple.com?saddr=Cupertino&daddr=San%20Francisco&dirflg=d")
+    }
+
+    @Test("Multistop driving URL preserves stop order and encodes names")
+    func multistopDirectionsURL() throws {
+        let url = try MapsURLBuilder.directions(
+            from: " 北京市 ",
+            to: "上海市",
+            mode: .driving,
+            via: ["洛阳市", " 芜湖市 ", "杭州市"]
+        )
+        let components = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false))
+        #expect(components.path == "/directions")
+        #expect(components.queryItems?.map(\.name) == [
+            "source", "waypoint", "waypoint", "waypoint", "destination", "mode"
+        ])
+        #expect(components.queryItems?.compactMap(\.value) == [
+            "北京市", "洛阳市", "芜湖市", "杭州市", "上海市", "driving"
+        ])
+    }
+
+    @Test("Invalid waypoint produces a numbered error")
+    func invalidWaypoint() {
+        #expect(throws: MapsURLBuilderError.invalidInput("Waypoint 2 cannot be empty.")) {
+            try MapsURLBuilder.directions(
+                from: "A", to: "B", mode: .driving, via: ["C", "  "]
+            )
+        }
     }
 
     @Test("Cycling directions are rejected for maps URL")

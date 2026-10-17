@@ -292,6 +292,16 @@ struct DirectionsResponse: Sendable, Codable, Equatable {
     let routes: [Route]
 }
 
+struct ItineraryDirectionsResponse: Sendable, Codable, Equatable {
+    let from: String
+    let via: [String]
+    let to: String
+    let transportType: String
+    let totalDistanceM: Double
+    let totalDurationS: Double
+    let legs: [DirectionsResponse]
+}
+
 struct OpenResponse: Sendable, Codable, Equatable {
     let action: String
     let url: String

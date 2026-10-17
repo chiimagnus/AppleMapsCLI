@@ -33,6 +33,16 @@ struct DirectionsCommandParsingTests {
         #expect(!parsed.alternatives)
     }
 
+    @Test("Preserves repeated stop options")
+    func parseWaypoints() throws {
+        let parsed = try DirectionsCommand.parse([
+            "--from", "北京", "--via", "洛阳", "--via", "芜湖",
+            "--via", "杭州", "--to", "上海", "--alternatives"
+        ])
+        #expect(parsed.via == ["洛阳", "芜湖", "杭州"])
+        #expect(parsed.alternatives)
+    }
+
     @Test("Allows schema flag without required endpoints")
     func schemaWithoutEndpoints() throws {
         let parsed = try DirectionsCommand.parse(["--json-schema"])
