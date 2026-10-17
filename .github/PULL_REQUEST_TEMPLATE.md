@@ -26,4 +26,4 @@
 
 ## Tests & validation
 
-<!-- Cover as many applicable environments (macOS minimum/current, ARM/Intel), inputs, failure states, edge/extreme cases and combinations as feasible. Specify exact commands and exit outcomes, unit/integration/manual results, and real MapKit/Maps.app observations. Itemize EACH untested applicable case with reason, risk, alternative evidence and follow-up. CI green alone does not prove live navigation works. -->
+<!-- Cover as many applicable environments (macOS 15.6+/current on Apple Silicon), inputs, failure states, edge/extreme cases and combinations as feasible. Specify exact commands and exit outcomes, unit/integration/manual results, and real MapKit/Maps.app observations. Itemize EACH untested applicable case with reason, risk, alternative evidence and follow-up. CI green alone does not prove live navigation works. -->

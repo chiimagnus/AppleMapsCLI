@@ -495,7 +495,7 @@ import PackageDescription
 
 let package = Package(
     name: "applemaps",
-    platforms: [.macOS(.v13)],  // Ventura for full async MapKit
+    platforms: [.macOS("15.6")],  // macOS 15.6+ on Apple Silicon
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
     ],
@@ -724,4 +724,4 @@ BEGIN NOW. Read progress.txt and start Phase 1 (Orient).
 
 **Last updated:** 2026-02-15  
 **Swift version:** 6.2.3  
-**Platform:** macOS 13+ (Ventura)
+**Platform:** macOS 15.6+ (Apple Silicon only)

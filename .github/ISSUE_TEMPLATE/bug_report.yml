@@ -33,7 +33,7 @@ body:
     id: system
     attributes:
       label: Environment
-      placeholder: macOS version, Apple Silicon/Intel, Homebrew/source, relevant MapKit mode
+      placeholder: macOS version (15.6+), Apple Silicon, Homebrew/source, relevant MapKit mode
     validations:
       required: true
   - type: textarea

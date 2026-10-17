@@ -78,7 +78,7 @@ import PackageDescription
 
 let package = Package(
     name: "applemaps",
-    platforms: [.macOS(.v13)],
+    platforms: [.macOS("15.6")],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.0")
     ],
@@ -97,7 +97,7 @@ let package = Package(
 )
 ```
 
-The tool requires **macOS 13+** (Ventura) for full async/await MapKit support and modern MKLocalSearch features. No Xcode project file is needed — `swift build` compiles directly. No entitlements are required for local development and direct distribution; the Maps entitlement is only needed for Mac App Store distribution.
+The tool requires **macOS 15.6+** on Apple Silicon for full async/await MapKit support and modern MKLocalSearch features. No Xcode project file is needed — `swift build` compiles directly. No entitlements are required for local development and direct distribution; the Maps entitlement is only needed for Mac App Store distribution.
 
 ---
 
@@ -549,7 +549,7 @@ Each subcommand conforms to `AsyncParsableCommand` since all MapKit operations a
 
 ### Build and distribution
 
-The tool compiles to a single static binary via `swift build -c release`. Distribution options include Homebrew tap (`brew install steipete/tap/applemaps`), direct download of the universal binary (arm64 + x86_64 via `lipo`), or Mint (`mint install steipete/applemaps`). No code signing or notarization is strictly required for developer tools distributed outside the App Store, though notarization is recommended for broader distribution.
+The tool compiles to a single static binary via `swift build -c release`. Distribution options include Homebrew tap (`brew install chiimagnus/tap/applemapscli`), direct download of the arm64 binary, or source builds (`swift build -c release`). No code signing or notarization is strictly required for developer tools distributed outside the App Store, though notarization is recommended for broader distribution.
 
 ---
 

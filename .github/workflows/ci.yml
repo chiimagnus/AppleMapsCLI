@@ -24,8 +24,8 @@ jobs:
         include:
           - runner: macos-26
             arch: arm64
-          - runner: macos-15-intel
-            arch: x86_64
+          - runner: macos-15
+            arch: arm64
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -36,7 +36,7 @@ jobs:
         run: test "$(uname -m)" = "${{ matrix.arch }}"
 
       - name: Select Xcode 26 on macOS 15
-        if: matrix.runner == 'macos-15-intel'
+        if: matrix.runner == 'macos-15'
         shell: bash
         run: |
           set -euo pipefail

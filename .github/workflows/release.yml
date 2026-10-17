@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   package:
-    name: Build universal macOS archive
+    name: Build Apple Silicon macOS archive
     runs-on: macos-26
     timeout-minutes: 25
     permissions:
@@ -58,35 +58,33 @@ jobs:
       - name: Re-test tagged source
         run: swift test --disable-automatic-resolution
 
-      - name: Build and inspect universal release
+      - name: Build and inspect arm64 release
         shell: bash
         run: |
           set -euo pipefail
-          swift build -c release --disable-automatic-resolution --arch arm64 --arch x86_64
+          swift build -c release --disable-automatic-resolution --arch arm64
           binary=".build/release/applemaps"
-          for arch in arm64 x86_64; do
-            lipo "$binary" -verify_arch "$arch"
-            vtool -show-build -arch "$arch" "$binary" | grep -Eq 'minos[[:space:]]+13\.0'
-          done
+          test "$(lipo -archs "$binary")" = arm64
+          vtool -show-build "$binary" | grep -Eq 'minos[[:space:]]+15\.6'
           "$binary" --help | grep -q 'USAGE: applemaps'
           "$binary" directions --json-schema | python3 -c 'import json,sys; assert "via" in json.load(sys.stdin)["input"]["properties"]'
           mkdir -p dist
-          COPYFILE_DISABLE=1 tar -czf dist/applemaps-macos-universal.tar.gz -C .build/release applemaps
-          test "$(tar -tzf dist/applemaps-macos-universal.tar.gz)" = "applemaps"
+          COPYFILE_DISABLE=1 tar -czf dist/applemaps-macos-arm64.tar.gz -C .build/release applemaps
+          test "$(tar -tzf dist/applemaps-macos-arm64.tar.gz)" = "applemaps"
 
       - name: Upload archive for verification
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: release-package
-          path: dist/applemaps-macos-universal.tar.gz
+          path: dist/applemaps-macos-arm64.tar.gz
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
 
-  verify-intel:
-    name: Run packaged binary on Intel macOS
+  verify-macos15:
+    name: Run packaged binary on macOS 15 arm64
     needs: package
-    runs-on: macos-15-intel
+    runs-on: macos-15
     timeout-minutes: 10
     steps:
       - name: Download release package
@@ -95,22 +93,20 @@ jobs:
           name: release-package
           path: dist
 
-      - name: Verify x86_64 archive execution
+      - name: Verify arm64 archive execution
         shell: bash
         run: |
           set -euo pipefail
-          test "$(uname -m)" = x86_64
+          test "$(uname -m)" = arm64
           mkdir -p "$RUNNER_TEMP/verify"
-          tar -xzf dist/applemaps-macos-universal.tar.gz -C "$RUNNER_TEMP/verify"
-          for arch in arm64 x86_64; do
-            lipo "$RUNNER_TEMP/verify/applemaps" -verify_arch "$arch"
-          done
+          tar -xzf dist/applemaps-macos-arm64.tar.gz -C "$RUNNER_TEMP/verify"
+          test "$(lipo -archs "$RUNNER_TEMP/verify/applemaps")" = arm64
           "$RUNNER_TEMP/verify/applemaps" --help | grep -q 'USAGE: applemaps'
           "$RUNNER_TEMP/verify/applemaps" directions --json-schema | python3 -c 'import json,sys; assert "via" in json.load(sys.stdin)["input"]["properties"]'
 
   publish:
     name: Publish GitHub Release
-    needs: [package, verify-intel]
+    needs: [package, verify-macos15]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -127,7 +123,7 @@ jobs:
       - name: Attest release archive
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
         with:
-          subject-path: dist/applemaps-macos-universal.tar.gz
+          subject-path: dist/applemaps-macos-arm64.tar.gz
 
       - name: Publish
         env:
@@ -135,6 +131,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release create "$GITHUB_REF_NAME" dist/applemaps-macos-universal.tar.gz \
+          gh release create "$GITHUB_REF_NAME" dist/applemaps-macos-arm64.tar.gz \
             --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes \
             --title "$GITHUB_REF_NAME" --latest

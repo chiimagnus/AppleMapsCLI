@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "AppleMapsCLI",
-    platforms: [.macOS(.v13)],
+    platforms: [.macOS("15.6")],
     products: [
         .executable(name: "applemaps", targets: ["AppleMapsCLI"])
     ],
