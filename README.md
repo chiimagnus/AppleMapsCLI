@@ -2,9 +2,12 @@
 
 Native Apple Maps CLI for macOS, built with Swift 6. The executable is `applemaps`.
 
-Forked from [rastreus/applmaps](https://github.com/rastreus/applmaps) under the MIT license; this fork adds ordered multi-stop routes.
+Forked from [rastreus/applmaps](https://github.com/rastreus/applmaps) under the MIT license;
+this fork adds ordered multi-stop routes.
 
-`applemaps` provides scriptable access to Apple Maps capabilities including geocoding, reverse geocoding, search, autocomplete, directions, ETA, URL opening, pin dropping, and POI category listing.
+`applemaps` provides scriptable access to Apple Maps capabilities including geocoding, reverse
+geocoding, search, autocomplete, directions, ETA, URL opening, pin dropping, and POI category
+listing.
 
 ## Status
 
@@ -17,7 +20,8 @@ Forked from [rastreus/applmaps](https://github.com/rastreus/applmaps) under the 
 ## Requirements
 
 - macOS 15.6 or later, Apple Silicon (arm64)
-- Xcode 26 or later (Swift 6.2+, MapKit cycling API) **only when building from source**. Xcode 26 requires macOS 15.6+ on the build machine.
+- Xcode 26 or later (Swift 6.2+, MapKit cycling API) **only when building from source**. Xcode
+  26 requires macOS 15.6+ on the build machine.
 
 ## Install
 
@@ -26,7 +30,8 @@ brew install chiimagnus/tap/applemapscli
 applemaps --help
 ```
 
-GitHub Releases distribute one precompiled Apple Silicon binary. See [release and Homebrew details](docs/release.md).
+GitHub Releases distribute one precompiled Apple Silicon binary. See
+[release and Homebrew details](docs/release.md).
 
 ## Build
 
@@ -119,9 +124,16 @@ Use `--via` multiple times to keep intermediate stops in the requested order:
   --via "杭州市" --to "上海市" --mode driving
 ```
 
-- `directions --via` asks MapKit for each **adjacent pair** in sequence and returns `legs`, `total_distance_m`, and `total_duration_s`. Totals sum the first suggested route for each leg; they do not represent one continuous MapKit route. Without `--via`, existing single-route JSON remains unchanged.
-- `open --via` uses Apple's unified multistop Maps URL. It **opens the route request**, but Maps may display "Route Not Available" even when it correctly lists all the stops. URL dispatch success is not proof of navigation availability.
-- Apple Maps may calculate the trip after stops are added manually one by one, but this tool does not script the Maps UI or save to its private route database. Save the JSON to a local file as shown above.
+- `directions --via` asks MapKit for each **adjacent pair** in sequence and returns `legs`,
+  `total_distance_m`, and `total_duration_s`. Totals sum the first suggested route for each
+  leg; they do not represent one continuous MapKit route. Without `--via`, existing single-route
+  JSON remains unchanged.
+- `open --via` uses Apple's unified multistop Maps URL. It **opens the route request**, but
+  Maps may display "Route Not Available" even when it correctly lists all the stops. URL
+  dispatch success is not proof of navigation availability.
+- Apple Maps may calculate the trip after stops are added manually one by one, but this tool
+  does not script the Maps UI or save to its private route database. Save the JSON to a local
+  file as shown above.
 - No API key, paid routing provider, background service, or telemetry is required.
 
 ### Open and pin

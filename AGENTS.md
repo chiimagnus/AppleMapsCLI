@@ -1,6 +1,7 @@
 # AGENTS.md — AppleMapsCLI (Codex-native instructions)
 
-**Project:** `AppleMapsCLI` — executable `applemaps`, native Apple Maps CLI for macOS (Swift 6, SwiftPM).
+**Project:** `AppleMapsCLI` — executable `applemaps`, native Apple Maps CLI for macOS (Swift
+6, SwiftPM).
 **Goal:** Programmatic access to Apple Maps capabilities (search, geocode, reverse, ETA, directions) + GUI control via `maps://` URLs.  
 **CLI Contract:** JSON-first, zero interactivity, semantic exit codes, pipe-friendly.
 
@@ -10,9 +11,13 @@
 
 This project has two complementary agent instruction files:
 
-- **AGENTS.md (this file)** — Permanent project policy, architecture rules, technical constraints, and coding standards. Read this to understand the project's non-negotiable requirements and design decisions.
+- **AGENTS.md (this file)** — Permanent project policy, architecture rules, technical constraints,
+  and coding standards. Read this to understand the project's non-negotiable requirements and
+  design decisions.
 
-- **PROMPT.md** — Per-iteration instructions for autonomous development loops (Ralph/Codex). Read this when working in an autonomous agent context where you receive stories from prd.json and commit via TCR cycles.
+- **PROMPT.md** — Per-iteration instructions for autonomous development loops (Ralph/Codex).
+  Read this when working in an autonomous agent context where you receive stories from prd.json
+  and commit via TCR cycles.
 
 **When to read which:**
 - Manual development → Read AGENTS.md
@@ -55,7 +60,8 @@ When operating in autonomous mode (Codex/Ralph loops):
 - ❌ "Is this the right approach?" → Proceed with best judgment, TCR will validate
 - ❌ "Can I create a new file?" → YES, follow architecture rules
 
-**The process IS the permission structure.** Follow PROMPT.md phases religiously, and you have full autonomy to ship.
+**The process IS the permission structure.** Follow PROMPT.md phases religiously, and you have
+full autonomy to ship.
 
 ---
 
@@ -164,7 +170,8 @@ Do not invent additional codes without updating this doc and tests.
 ### Rules
 - **Stdout:** ONLY the result payload (JSON/text/table). No logs.
 - **Stderr:** diagnostics/errors (when appropriate)
-- **JSON schemas must be stable:** additive changes OK, breaking changes require version bump and docs
+- **JSON schemas must be stable:** additive changes OK, breaking changes require version bump
+  and docs
 - **Compact JSON when piped:** unless `--pretty` is explicitly set
 - **Pretty JSON for TTY:** when outputting to terminal (isatty check)
 
@@ -444,7 +451,8 @@ See **PROMPT.md** for the complete iteration protocol including:
 
 **Types:** `feat`, `fix`, `test`, `refactor`, `docs`, `chore`
 
-**Scopes:** `cli`, `commands`, `core`, `output`, `maps`, `geocode`, `directions`, `eta`, `url`, `config`, `tests`, `build`
+**Scopes:** `cli`, `commands`, `core`, `output`, `maps`, `geocode`, `directions`, `eta`, `url`,
+`config`, `tests`, `build`
 
 ### Examples:
 ```
@@ -528,7 +536,8 @@ let package = Package(
 
 ## 13) Discovered Patterns (knowledge compounding)
 
-This section accumulates learnings from implementation iterations. When you discover gotchas, quirks, or useful patterns, document them here so future iterations don't repeat mistakes.
+This section accumulates learnings from implementation iterations. When you discover gotchas,
+quirks, or useful patterns, document them here so future iterations don't repeat mistakes.
 
 ### Format:
 ```
@@ -545,8 +554,10 @@ This section accumulates learnings from implementation iterations. When you disc
 
 ### ArgumentParser Subcommand Names — Set commandName explicitly
 **Discovered in:** Iteration 1, Story S01
-**Context:** `applemaps geocode "Apple Park"` was rejected even though `GeocodeCommand` was registered as a subcommand.
-**Discovery:** ArgumentParser did not expose the intended CLI token from the type name in this setup.
+**Context:** `applemaps geocode "Apple Park"` was rejected even though `GeocodeCommand` was
+registered as a subcommand.
+**Discovery:** ArgumentParser did not expose the intended CLI token from the type name in this
+setup.
 **Pattern:** Always set `commandName` in each command's `CommandConfiguration`.
 
 ```swift
@@ -560,57 +571,81 @@ struct GeocodeCommand: AsyncParsableCommand {
 
 ### Swift Entrypoint File Name — Avoid `@main` in `main.swift` for multi-file targets
 **Discovered in:** Iteration 1, Story S01
-**Context:** Build failed after adding more source files with `@main` still inside `Sources/.../main.swift`.
-**Discovery:** Swift reported `'main' attribute cannot be used in a module that contains top-level code`.
-**Pattern:** Use `@main` in a non-`main.swift` file (e.g., `AppleMapsCLI.swift`) for executable targets with multiple source files.
+**Context:** Build failed after adding more source files with `@main` still inside
+`Sources/.../main.swift`.
+**Discovery:** Swift reported
+`'main' attribute cannot be used in a module that contains top-level code`.
+**Pattern:** Use `@main` in a non-`main.swift` file (e.g., `AppleMapsCLI.swift`) for executable
+targets with multiple source files.
 
 ### Negative Coordinate Parsing — Use passthrough positional capture
 **Discovered in:** Iteration 2, Story S02
-**Context:** `applemaps reverse 37.3349 -122.0090` parsed `-122.0090` as an option instead of a positional value.
-**Discovery:** Swift Argument Parser treats dash-prefixed positionals as options under default positional parsing.
-**Pattern:** For commands that accept signed numeric positional values, capture coordinates as `@Argument(parsing: .captureForPassthrough) [String]` and parse/validate manually in the command or runner.
+**Context:** `applemaps reverse 37.3349 -122.0090` parsed `-122.0090` as an option instead of
+a positional value.
+**Discovery:** Swift Argument Parser treats dash-prefixed positionals as options under default
+positional parsing.
+**Pattern:** For commands that accept signed numeric positional values, capture coordinates
+as `@Argument(parsing: .captureForPassthrough) [String]` and parse/validate manually in the
+command or runner.
 
 ### JSON Field Projection — Project after encoding and keep container paths
 **Discovered in:** Iteration 9, Story S09
-**Context:** Implementing `--fields name,coordinate` for command outputs where requested fields live inside nested arrays (for example `results`).
+**Context:** Implementing `--fields name,coordinate` for command outputs where requested fields
+live inside nested arrays (for example `results`).
 **Discovery:** Naive top-level key filtering drops nested matches and can produce empty payloads.
-**Pattern:** Apply projection to encoded JSON (`snake_case` already applied), recurse through objects/arrays, and keep parent containers only when descendants match requested keys.
+**Pattern:** Apply projection to encoded JSON (`snake_case` already applied), recurse through
+objects/arrays, and keep parent containers only when descendants match requested keys.
 
 ### Passthrough Coordinate Flags — Parse trailing options from captured tokens
 **Discovered in:** Iteration 9, Story S09
-**Context:** Adding `--fields` to coordinate commands that already use passthrough capture for signed values.
-**Discovery:** Flags placed after coordinates are absorbed into passthrough tokens, so ArgumentParser does not populate option properties.
-**Pattern:** Add a command-local token parser for passthrough commands (`reverse`, `pin`) that resolves trailing `--fields` / `--pretty` / command-specific flags before coordinate validation.
+**Context:** Adding `--fields` to coordinate commands that already use passthrough capture for
+signed values.
+**Discovery:** Flags placed after coordinates are absorbed into passthrough tokens, so
+ArgumentParser does not populate option properties.
+**Pattern:** Add a command-local token parser for passthrough commands (`reverse`, `pin`) that
+resolves trailing `--fields` / `--pretty` / command-specific flags before coordinate validation.
 
 ### Completion Script Generation — Delegate to ArgumentParser built-in flag
 **Discovered in:** Iteration 10, Story S10
 **Context:** Implementing explicit shell completion generation for `zsh`, `bash`, and `fish`.
-**Discovery:** Swift ArgumentParser already provides stable script generation through `--generate-completion-script <shell>`.
-**Pattern:** Expose a user-facing command that delegates to the current executable with `--generate-completion-script`, then add explicit shell validation in command logic to preserve semantic exit codes (`1` for invalid shell).
+**Discovery:** Swift ArgumentParser already provides stable script generation through
+`--generate-completion-script <shell>`.
+**Pattern:** Expose a user-facing command that delegates to the current executable with
+`--generate-completion-script`, then add explicit shell validation in command logic to preserve
+semantic exit codes (`1` for invalid shell).
 
 ### Recursive Schema Nodes — Avoid self-recursive structs
 **Discovered in:** Iteration 11, Story S11
 **Context:** Building reusable JSON schema documents with nested `properties`, `items`, and `oneOf`.
-**Discovery:** A self-recursive value type (`struct` containing itself via optional fields) fails with Swift's infinite-size check.
-**Pattern:** Model recursive schema trees with a recursion-safe representation (`final class` or `indirect enum`) so Codable recursion compiles cleanly.
+**Discovery:** A self-recursive value type (`struct` containing itself via optional fields)
+fails with Swift's infinite-size check.
+**Pattern:** Model recursive schema trees with a recursion-safe representation (`final class`
+or `indirect enum`) so Codable recursion compiles cleanly.
 
 ### MapKit Autocomplete Service — Prefer async service+runner mapping
 **Discovered in:** Iteration 12, Story S12
 **Context:** Implementing the `complete` command for query autocomplete suggestions.
-**Discovery:** Wrapping autocomplete behavior in a dedicated async core service keeps command code small, avoids callback/delegate complexity, and makes semantic exit mapping deterministic in tests.
+**Discovery:** Wrapping autocomplete behavior in a dedicated async core service keeps command
+code small, avoids callback/delegate complexity, and makes semantic exit mapping deterministic
+in tests.
 **Pattern:** Implement `SearchCompletionService` + `SearchCompletionRunner`, use `MKLocalSearch` with `.pointOfInterest` for suggestion candidates, dedupe by normalized `title|subtitle`, and map MapKit failures into `CLIError.network` / `CLIError.noResults` in the runner.
 
 ### POI Category Catalog — Maintain explicit category mapping
 **Discovered in:** Iteration 13, Story S13
 **Context:** Implementing `applemaps categories` from `MKPointOfInterestCategory`.
-**Discovery:** MapKit does not expose a direct `allCategories` enumeration API suitable for deterministic CLI output.
-**Pattern:** Maintain an explicit ordered mapping of `(id, MKPointOfInterestCategory)` values, emit both CLI-friendly `id` and `mapkit_value`, and normalize output in a runner (dedupe + sort) before formatting to JSON/text/table.
+**Discovery:** MapKit does not expose a direct `allCategories` enumeration API suitable for
+deterministic CLI output.
+**Pattern:** Maintain an explicit ordered mapping of `(id, MKPointOfInterestCategory)` values,
+emit both CLI-friendly `id` and `mapkit_value`, and normalize output in a runner (dedupe +
+sort) before formatting to JSON/text/table.
 
 ### MapKit ETA Response Type — Use Swift name `MKDirections.ETAResponse`
 **Discovered in:** Iteration 4, Story S04
 **Context:** Implementing the `eta` command service with `MKDirections.calculateETA()`.
-**Discovery:** The Objective-C type `MKETAResponse` is obsoleted in Swift and renamed to `MKDirections.ETAResponse`; using `MKETAResponse` fails compilation on Swift 6.
-**Pattern:** In Swift code and signatures, use `MKDirections.ETAResponse` for ETA responses from MapKit.
+**Discovery:** The Objective-C type `MKETAResponse` is obsoleted in Swift and renamed to
+`MKDirections.ETAResponse`; using `MKETAResponse` fails compilation on Swift 6.
+**Pattern:** In Swift code and signatures, use `MKDirections.ETAResponse` for ETA responses
+from MapKit.
 
 ### MapKit Rate Limiting — Handle throttling gracefully
 **Context:** Placeholder for future discoveries during implementation
@@ -621,8 +656,14 @@ struct GeocodeCommand: AsyncParsableCommand {
 **Pattern:** When implemented, document batching approach here
 
 ### Multistop Maps URLs vs. MapKit pairwise routing
-**Context:** The Maps app supports adding driving stops manually, but the public `MKDirections.Request` has a single source and destination. `MKMapItem.openMaps` with directions permits at most two items.
-**Pattern:** Repeat `waypoint` parameters in the unified `/directions` URL (macOS 15.4+) to request a multistop preview. The app may still report an unavailable route; opening the URL does not verify route computation. For reliable structured estimates, calculate consecutive two-point `MKDirections` legs and add the first route's distance and duration. Do not automate the Maps app via Accessibility.
+**Context:** The Maps app supports adding driving stops manually, but the public
+`MKDirections.Request` has a single source and destination. `MKMapItem.openMaps` with directions
+permits at most two items.
+**Pattern:** Repeat `waypoint` parameters in the unified `/directions` URL (macOS 15.4+) to
+request a multistop preview. The app may still report an unavailable route; opening the URL
+does not verify route computation. For reliable structured estimates, calculate consecutive
+two-point `MKDirections` legs and add the first route's distance and duration. Do not automate
+the Maps app via Accessibility.
 
 ### maps:// URL Quirks — Coordinate snapping behavior
 **Context:** Placeholder for future discoveries during implementation
@@ -630,7 +671,8 @@ struct GeocodeCommand: AsyncParsableCommand {
 
 ---
 
-*(This section will grow as implementation proceeds. Each iteration should check: "Did I discover anything worth documenting here?")*
+*(This section will grow as implementation proceeds. Each iteration should check: "Did I
+discover anything worth documenting here?")*
 
 ---
 

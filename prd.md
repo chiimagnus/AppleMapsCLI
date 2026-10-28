@@ -9,7 +9,10 @@
 
 ## Executive Summary
 
-`applemaps` is a native macOS command-line tool that provides programmatic access to Apple Maps services. It wraps MapKit's non-UI APIs (search, geocoding, directions, ETA calculation) and the `maps://` URL scheme to give developers and AI coding agents structured, machine-readable access to Apple Maps without opening Xcode or launching a GUI application.
+`applemaps` is a native macOS command-line tool that provides programmatic access to Apple
+Maps services. It wraps MapKit's non-UI APIs (search, geocoding, directions, ETA calculation)
+and the `maps://` URL scheme to give developers and AI coding agents structured, machine-readable
+access to Apple Maps without opening Xcode or launching a GUI application.
 
 ### Problem Statement
 
@@ -27,7 +30,8 @@ Currently, there is no official Apple-provided CLI for these tasks. Developers m
 
 ### Solution
 
-A Swift 6 CLI tool that exposes MapKit capabilities through simple, composable commands with JSON-first output. The tool follows agent-first design principles:
+A Swift 6 CLI tool that exposes MapKit capabilities through simple, composable commands with
+JSON-first output. The tool follows agent-first design principles:
 - Machine-readable JSON output by default
 - Zero interactivity (no prompts or spinners)
 - Semantic exit codes for programmatic handling
@@ -38,7 +42,8 @@ A Swift 6 CLI tool that exposes MapKit capabilities through simple, composable c
 ## User Personas
 
 ### Primary Persona: AI Coding Agent
-**Description:** LLM-powered development assistants (Claude, GPT-4, etc.) that generate code, automate tasks, and process data through CLI tools.
+**Description:** LLM-powered development assistants (Claude, GPT-4, etc.) that generate code,
+automate tasks, and process data through CLI tools.
 
 **Needs:**
 - Structured, parseable output (JSON)
@@ -53,7 +58,8 @@ A Swift 6 CLI tool that exposes MapKit capabilities through simple, composable c
 - Opening Maps at specific locations for user workflows
 
 ### Secondary Persona: Developer/Scripter
-**Description:** macOS developers and power users who automate workflows with shell scripts, Python, or other languages.
+**Description:** macOS developers and power users who automate workflows with shell scripts,
+Python, or other languages.
 
 **Needs:**
 - Fast, local geocoding without API keys
@@ -68,7 +74,8 @@ A Swift 6 CLI tool that exposes MapKit capabilities through simple, composable c
 - Integration testing for mapping features
 
 ### Tertiary Persona: MCP Server Operator
-**Description:** Users running Model Context Protocol servers to give LLMs access to local system capabilities.
+**Description:** Users running Model Context Protocol servers to give LLMs access to local
+system capabilities.
 
 **Needs:**
 - Native MCP server mode for direct LLM integration
@@ -466,7 +473,8 @@ Programmatic error handling through consistent exit codes.
 
 ## Appendix: maps:// URL Scheme Reference
 
-*(See design document section "Apple Maps URL schemes — complete reference" for full parameter listing)*
+*(See design document section "Apple Maps URL schemes — complete reference" for full parameter
+listing)*
 
 **Supported base formats:**
 - `maps://?{params}`
